@@ -1,0 +1,59 @@
+services:
+  rosmaster:
+    image: ros:noetic-ros-core
+    command: roscore
+    restart: unless-stopped
+  scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+    command: roslaunch --wait rplidar_ros rplidar_a2m12.launch
+    environment:
+      ROS_HOSTNAME: scanner
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0 # dont forget to make sure this has 666 permissions
+    restart: unless-stopped
+  nt_bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+    command: roslaunch --wait frc_basics ros_bridge.launch hostname:=host.docker.internal
+    environment:
+      ROS_HOSTNAME: nt_bridge
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  bagger:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+    command: roslaunch --wait bag_manager auto_bagger.launch
+    environment:
+      ROS_HOSTNAME: bagger
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    volumes:
+      - bags:/bags
+  portainer:  # Web UI managing containers
+    image: portainer/portainer-ce:2.20.3
+    ports:
+      - 9443:9443
+    volumes:
+      - data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+  dnsresolver: # Allows you to use ROS tools on host machine easily
+    image: dvdarias/docker-hoster
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /etc/hosts:/tmp/hosts
+    restart: unless-stopped
+volumes:
+  data:
+  bags:

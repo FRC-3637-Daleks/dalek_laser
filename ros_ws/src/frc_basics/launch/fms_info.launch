@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="namespace"         default="frc"/>
+  <arg name="parameter_path"    default="$(find frc_basics)/config"/>
+  
+  <arg name="team_number"           default=""            doc="Team number, used to find server if hostname is not provided" />
+  <arg name="hostname"              default=""            doc="hostname of nt server" />
+  <arg name="port"                  default=""            doc="sets the communication port, 0 tells it to use default port" />
+
+  <node ns="$(arg namespace)" pkg="frc_basics" type="fms_info" name="info_node" output="screen">
+    <rosparam command="load" file="$(arg parameter_path)/fms_params.yaml" />
+    <param name="team_number"       value="$(arg team_number)" if="$(eval arg('team_number') != '')"/>
+    <param name="hostname"          value="$(arg hostname)" if="$(eval arg('hostname') != '')"/>
+    <param name="port"              value="$(arg port)" if="$(eval arg('port') != '')"/>
+  </node>
+
+</launch>

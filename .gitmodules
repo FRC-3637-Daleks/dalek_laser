@@ -1,0 +1,9 @@
+[submodule "ros_ws/src/frc_basics"]
+	path = ros_ws/src/frc_basics
+	url = https://gitlab.com/siege-robotics/ros/frc_specific_pkgs/frc_basics.git
+[submodule "ros_ws/src/rplidar_ros"]
+	path = ros_ws/src/rplidar_ros
+	url = https://github.com/Slamtec/rplidar_ros.git
+[submodule "ros_ws/src/frc_msgs"]
+	path = ros_ws/src/frc_msgs
+	url = https://gitlab.com/siege-robotics/ros/frc_specific_pkgs/frc_msgs.git

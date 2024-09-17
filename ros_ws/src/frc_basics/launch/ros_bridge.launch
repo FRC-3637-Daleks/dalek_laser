@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="namespace"         default="frc"/>
+  <arg name="parameter_path"    default="$(find frc_basics)/config"/>
+
+  <arg name="nt_table"          default=""            doc="Path to network table containing drivetrain values" />
+  <arg name="team_number"           default=""            doc="Team number, used to find server if hostname is not provided" />
+  <arg name="hostname"              default=""            doc="hostname of nt server" />
+  <arg name="port"                  default=""            doc="sets the communication port, 0 tells it to use default port" />
+
+  <include file="$(find frc_basics)/launch/fms_info.launch">
+    <arg name="namespace" value="$(arg namespace)"/>
+    <arg name="parameter_path" value="$(arg parameter_path)"/>
+    <arg name="team_number" value="$(arg team_number)" if="$(eval arg('team_number') != '')"/>
+    <arg name="hostname" value="$(arg hostname)" if="$(eval arg('hostname') != '')"/>
+    <arg name="port" value="$(arg port)" if="$(eval arg('port') != '')"/>
+  </include>
+
+  <include file="$(find frc_basics)/launch/drivetrain_interface.launch">
+    <arg name="namespace" value="$(arg namespace)/drivetrain"/>
+    <arg name="parameter_path" value="$(arg parameter_path)"/>
+    <arg name="nt_table" value="$(arg nt_table)" if="$(eval arg('nt_table') != '')" />
+    <arg name="team_number" value="$(arg team_number)" if="$(eval arg('team_number') != '')"/>
+    <arg name="hostname" value="$(arg hostname)" if="$(eval arg('hostname') != '')"/>
+    <arg name="port" value="$(arg port)" if="$(eval arg('port') != '')"/>
+  </include>
+</launch>
