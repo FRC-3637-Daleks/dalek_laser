@@ -14,7 +14,7 @@ services:
       ROS_HOSTNAME: scanner
       ROS_MASTER_URI: "http://rosmaster:11311"
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0 # dont forget to make sure this has 666 permissions
+      - ${SCANNER_0:-/dev/null}:/dev/ttyUSB0 # dont forget to make sure this has 666 permissions
     restart: unless-stopped
   nt_bridge:
     build:
@@ -22,12 +22,12 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - rosmaster
-    command: roslaunch --wait frc_basics ros_bridge.launch hostname:=host.docker.internal
+    command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
     environment:
       ROS_HOSTNAME: nt_bridge
       ROS_MASTER_URI: "http://rosmaster:11311"
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "nt.server:${NT_SERVER:-host-gateway}"
   bagger:
     build:
       context: .
@@ -40,6 +40,19 @@ services:
       ROS_MASTER_URI: "http://rosmaster:11311"
     volumes:
       - bags:/bags
+  photonvision:
+    build:
+      context: photonvision
+      dockerfile: Dockerfile
+    extra_hosts:
+      - "nt.server:${NT_SERVER:-host-gateway}"
+    ports:
+      - 5800:5800
+      - 1181-1190
+    devices:
+      - ${CAMERA_0:-/dev/null}:/dev/video0
+    volumes:
+      - photonvision_config:/opt/photonvision/photonvision_config
   portainer:  # Web UI managing containers
     image: portainer/portainer-ce:2.20.3
     ports:
@@ -57,3 +70,4 @@ services:
 volumes:
   data:
   bags:
+  photonvision_config:
