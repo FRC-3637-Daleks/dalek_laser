@@ -59,7 +59,7 @@ services:
   portainer:  # Web UI managing containers
     image: portainer/portainer-ce:2.20.3
     ports:
-      - 9443:9443
+      - 5801:9443
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock

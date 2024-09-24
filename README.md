@@ -105,7 +105,7 @@ This service is a very simple launch file for rosbag right now which collects ba
 ### portainer
 
 portainer is a web frontend for managing docker containers and its especially useful when working with docker running on remote systems like with the coprocessor.
-Navigating to the coprocessor's hostname with port 9443 (subject to change to allow for connecting over FMS) allows you to view a nice dashboard with all the active containers. Here you can view their logs, see any errors, and even open an interactive shell in the browser in any container you choose to interact with it.
+Navigating to the coprocessor's hostname with port 5801 allows you to view a nice dashboard with all the active containers. Here you can view their logs, see any errors, and even open an interactive shell in the browser in any container you choose to interact with it.
 
 ### dnsresolver
 
