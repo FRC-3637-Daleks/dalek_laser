@@ -36,6 +36,31 @@ To do the above on the coprocessor from a separate machine (dev laptop), you wan
 
 Take care in figuring out what the hostname of the coprocessor is or its IP address to use here.
 
+### Running with `.env` files
+
+Depending on the situation, you will want to run different services with different arguments. For example, when connected to a robot you want to make sure the network table server is pointed at the rio, but when running locally you may want to point it at localhost where you have simulation running.
+
+To configure this, `.env` files are used to specify "profiles" to run and set certain variables for running.
+
+Here are the available profiles current:
+ - lidar: runs the scanner and localization algorithms depending on the lidar scanner
+ - cameras: runs photonvision
+
+Here are the variables used in the compose file
+ - `COMPOSE_PROFILES`: space separated list of profiles to activate
+ - `CAMERA_<N>`: if left empty, no camera will be mounted to photonvision. Otherwise, set this to the camera device photonvision should find. There are 2 of these but its easy to add more.
+ - `NT_SERVER`: by default it will search localhost, but if this value is set, specifies the address of the network tables server. On a real robot, should be `10.36.37.2`
+
+Here are the `.env` files currently available to use
+ - `local.env`: leaves everything to default, use this to test without any of the sensors/cameras
+ - `local_cam.env`: runs photonvision with 1 camera mounted
+ - `local_scanner.env`: runs the scanner pipeline
+ - `robot.env`: this is the configuration that should be used when deploying to the actual robot.
+
+ To run with a specific env file, use the following command
+
+    docker compose --env-file <filename>.env up -d
+
 ## Building without docker
 
 You can use the Dockerfile as a guide for building the ROS workspace outside of docker. Note that WPILIB is needed for frc_basics network tables bridge, and needs to be installed with the cmake instructions. You can follow the example in the Dockerfile for this too.

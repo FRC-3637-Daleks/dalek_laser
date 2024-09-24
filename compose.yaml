@@ -10,11 +10,12 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait rplidar_ros rplidar_a2m12.launch
+    profiles: [lidar]
     environment:
       ROS_HOSTNAME: scanner
       ROS_MASTER_URI: "http://rosmaster:11311"
     devices:
-      - ${SCANNER_0:-/dev/null}:/dev/ttyUSB0 # dont forget to make sure this has 666 permissions
+      - /dev/ttyUSB0 # dont forget to make sure this has proper permissions
     restart: unless-stopped
   nt_bridge:
     build:
@@ -44,13 +45,15 @@ services:
     build:
       context: photonvision
       dockerfile: Dockerfile
+    profiles: [cameras]
     extra_hosts:
       - "nt.server:${NT_SERVER:-host-gateway}"
     ports:
       - 5800:5800
       - 1181-1190
     devices:
-      - ${CAMERA_0:-/dev/null}:/dev/video0
+      - ${CAMERA_0:-/dev/null}
+      - ${CAMERA_1:-/dev/null}
     volumes:
       - photonvision_config:/opt/photonvision/photonvision_config
   portainer:  # Web UI managing containers
