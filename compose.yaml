@@ -29,6 +29,7 @@ services:
       ROS_MASTER_URI: "http://rosmaster:11311"
     extra_hosts:
       - "nt.server:${NT_SERVER:-host-gateway}"
+    restart: unless-stopped
   bagger:
     build:
       context: .
@@ -41,6 +42,7 @@ services:
       ROS_MASTER_URI: "http://rosmaster:11311"
     volumes:
       - bags:/bags
+    restart: unless-stopped
   photonvision:
     build:
       context: photonvision
@@ -56,6 +58,7 @@ services:
       - ${CAMERA_1:-/dev/null}
     volumes:
       - photonvision_config:/opt/photonvision/photonvision_config
+    restart: unless-stopped
   portainer:  # Web UI managing containers
     image: portainer/portainer-ce:2.20.3
     ports:
