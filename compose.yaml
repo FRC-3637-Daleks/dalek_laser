@@ -37,12 +37,26 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait bag_manager auto_bagger.launch
+    profiles: [lidar, bagger]
     environment:
       ROS_HOSTNAME: bagger
       ROS_MASTER_URI: "http://rosmaster:11311"
     volumes:
       - bags:/bags
     restart: unless-stopped
+  bag_player:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+    command: roslaunch --wait bag_manager play_with_tf.launch bag_file_str:="${BAG_FILE_STR}"
+    profiles: [replay]
+    environment:
+      ROS_HOSTNAME: bag_player
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    volumes:
+      - bags:/bags
   photonvision:
     build:
       context: photonvision
@@ -66,12 +80,6 @@ services:
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-  dnsresolver: # Allows you to use ROS tools on host machine easily
-    image: dvdarias/docker-hoster
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock
-      - /etc/hosts:/tmp/hosts
     restart: unless-stopped
 volumes:
   data:

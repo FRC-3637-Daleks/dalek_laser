@@ -52,6 +52,10 @@
   <build_depend>rosbag</build_depend>
   <build_export_depend>rosbag</build_export_depend>
   <exec_depend>rosbag</exec_depend>
+  <depend>tf</depend>
+  <depend>roscpp</depend>
+  <depend>nav_msgs</depend>
+  <depend>geometry_msgs</depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

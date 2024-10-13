@@ -1,0 +1,21 @@
+<launch>
+    <arg name="bag_dir" default="/bags" />
+    <arg name="bag_file_str" />
+
+    <param name="use_sim_time" value="true"/>
+
+    <node pkg="rosbag" type="play" name="bag_playback"
+        args="--clock -l $(arg bag_dir)/$(arg bag_file_str)"
+        required="true"
+        output="screen">
+    </node>
+
+    <node pkg="bag_manager" type="odometry_republisher_node" name="odom_to_base"
+        respawn="true">
+        <remap from="odom" to="/frc/drivetrain/nt2ros/odom"/>
+    </node>
+    <node pkg="tf" type="static_transform_publisher" name="base_to_laser"
+        args="-0.3175 0.3175 0.15 0 0 0 base_footprint laser 100"
+        respawn="true">
+    </node>
+</launch>
