@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7-labs
+# syntax=docker/dockerfile:1.7.0-labs
 FROM ros:noetic-ros-core AS build_environment
 
 RUN apt-get update && \
