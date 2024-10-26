@@ -13,10 +13,11 @@ endif()
 ## Find ROS Dependencies
 set(dependencies
   roscpp
-
   std_msgs
   sensor_msgs
   geometry_msgs
+  tf2
+  tf2_ros
   frc_msgs
 )
 
@@ -31,7 +32,7 @@ find_package(catkin REQUIRED COMPONENTS ${dependencies} cmake_modules
 ## Your package locations should be listed before other locations
 include_directories(
 	include
-  ${catkin_INCLUDE_DIRS} 
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder

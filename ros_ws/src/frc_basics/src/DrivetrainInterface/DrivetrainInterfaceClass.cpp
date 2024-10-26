@@ -2,7 +2,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-DrivetrainInterfaceNode::DrivetrainInterfaceNode(const ros::NodeHandle& _node_handle, 
+DrivetrainInterfaceNode::DrivetrainInterfaceNode(const ros::NodeHandle& _node_handle,
               const ros::NodeHandle& _private_node_handle)
 : nh_(_node_handle)
 , pnh_(_private_node_handle)
@@ -16,11 +16,11 @@ DrivetrainInterfaceNode::DrivetrainInterfaceNode(const ros::NodeHandle& _node_ha
   parameters_->get_parameters();
 
   // ROS Publishers and Subscribers
-  ROS_INFO_STREAM("  start subscribers");  
+  ROS_INFO_STREAM("  start subscribers");
   subTwist_ = nh_.subscribe<geometry_msgs::Twist>("ros2nt/cmd_vel", 10, std::bind(&DrivetrainInterfaceNode::subTwist_callback, this, std::placeholders::_1));
   subOdom_  = nh_.subscribe<nav_msgs::Odometry>("ros2nt/odom", 10, std::bind(&DrivetrainInterfaceNode::subOdom_callback, this, std::placeholders::_1));
 
-  ROS_INFO_STREAM("  start publishers"); 
+  ROS_INFO_STREAM("  start publishers");
   pubTwist_ = nh_.advertise<geometry_msgs::TwistWithCovarianceStamped>("nt2ros/twist", 10);
   pubOdom_  = nh_.advertise<nav_msgs::Odometry>("nt2ros/odom", 10);
   pubImu_   = nh_.advertise<sensor_msgs::Imu>("nt2ros/imu", 10);
@@ -42,7 +42,7 @@ void DrivetrainInterfaceNode::subTwist_callback(const geometry_msgs::Twist::Cons
 
     std::vector<double> linear = {message->linear.x, message->linear.y, message->linear.z};
     table_->linearTwistPub.Set(linear);
-    
+
     std::vector<double> angular = {message->angular.x, message->angular.y, message->angular.z};
     table_->angularTwistPub.Set(angular);
 
@@ -58,14 +58,14 @@ void DrivetrainInterfaceNode::subOdom_callback(const nav_msgs::Odometry::ConstPt
 {
   if(table_->IsConnected())
   {
-    ros::Time stamp = message->header.stamp; 
+    ros::Time stamp = message->header.stamp;
     int64_t timestamp = stamp.toNSec();
     table_->timestampOdomPub.Set(timestamp / 1000);
 
-    
+
     std::vector<double> linear = {message->pose.pose.position.x, message->pose.pose.position.y, message->pose.pose.position.z};
     table_->linearOdomPub.Set(linear);
-    
+
     std::vector<double> linearVel = {message->twist.twist.linear.x, message->twist.twist.linear.y, message->twist.twist.linear.z};
     table_->linearVelOdomPub.Set(linearVel);
 
@@ -77,7 +77,7 @@ void DrivetrainInterfaceNode::subOdom_callback(const nav_msgs::Odometry::ConstPt
     std::vector<double> angular = {roll, pitch, yaw};
     table_->angularOdomPub.Set(angular);
 
-    tf2::Quaternion qVel; 
+    tf2::Quaternion qVel;
     tf2::fromMsg(message->pose.pose.orientation, qVel);
     tf2::Matrix3x3 mVel(qVel);
     double rollVel, pitchVel, yawVel;
@@ -116,7 +116,7 @@ void DrivetrainInterfaceNode::pub_callback()
       motors_msg.voltage = voltage;
       motors_msg.current = current;
       motors_msg.pwm_ratio = pwmRatio;
-      motors_msg.temperature = temperature;    
+      motors_msg.temperature = temperature;
       motors_msg.angle = angle;
       motors_msg.rate = rate;
 
@@ -150,7 +150,7 @@ void DrivetrainInterfaceNode::pub_callback()
           0., 0., 0., static_cast<double>(parameters_->twist_cov_list[3]), 0., 0.,
           0., 0., 0., 0., static_cast<double>(parameters_->twist_cov_list[4]), 0.,
           0., 0., 0., 0., 0., static_cast<double>(parameters_->twist_cov_list[5]) };
-      
+
       pubTwist_.publish(twist_msg);
       // Odom
       auto timestampOdom = table_->timestampOdomSub.GetAtomic();
@@ -184,14 +184,28 @@ void DrivetrainInterfaceNode::pub_callback()
         0., 0., 0., 0., 0., static_cast<double>(parameters_->pose_cov_list[5]) };
 
       pubOdom_.publish(odom_msg);
+
+      geometry_msgs::TransformStamped tf_odom_to_base;
+      tf_odom_to_base.header.stamp = odom_msg.header.stamp;
+      tf_odom_to_base.header.frame_id = "odom";
+      tf_odom_to_base.child_frame_id = "base_footprint";
+      tf_odom_to_base.transform.translation.x = linear[0];
+      tf_odom_to_base.transform.translation.y = linear[1];
+      tf_odom_to_base.transform.translation.z = linear[2];
+      tf_odom_to_base.transform.rotation.x = q.x();
+      tf_odom_to_base.transform.rotation.y = q.y();
+      tf_odom_to_base.transform.rotation.z = q.z();
+      tf_odom_to_base.transform.rotation.w = q.w();
+
+      tf_br_.sendTransform(tf_odom_to_base);
     }
     // IMU
     if(pubImu_.getNumSubscribers() > 0)
-    {         
+    {
       auto timestampImu = table_->timestampOdomSub.GetAtomic();
       ros::Time rostimeImu;
       rostimeImu.fromNSec(timestampImu.time * 1000);
-      
+
       sensor_msgs::Imu imu_msg;
       std::vector<double> angular = table_->angularOdomSub.Get();
       std::vector<double> velAngular = table_->angularVelOdomSub.Get();
@@ -201,28 +215,28 @@ void DrivetrainInterfaceNode::pub_callback()
       imu_msg.angular_velocity.x    = velAngular[0];
       imu_msg.angular_velocity.y    = velAngular[1];
       imu_msg.angular_velocity.z    = velAngular[2];
-      
+
       imu_msg.angular_velocity_covariance = {
         static_cast<double>(parameters_->twist_cov_list[3]), 0., 0.,
         0., static_cast<double>(parameters_->twist_cov_list[4]), 0.,
         0., 0., static_cast<double>(parameters_->twist_cov_list[5]) };
-      
+
       imu_msg.linear_acceleration.x = accLinear[0];
       imu_msg.linear_acceleration.y = accLinear[1];
       imu_msg.linear_acceleration.z = accLinear[2];
-      
+
       imu_msg.linear_acceleration_covariance = {
         static_cast<double>(parameters_->acc_cov_list[0]), 0., 0.,
         0., static_cast<double>(parameters_->acc_cov_list[1]), 0.,
         0., 0., static_cast<double>(parameters_->acc_cov_list[2]) };
-      
+
       tf2::Quaternion q;
       q.setRPY(angular[0], angular[1], angular[2]);
       imu_msg.orientation.x = q.getX();
-      imu_msg.orientation.y = q.getY(); 
+      imu_msg.orientation.y = q.getY();
       imu_msg.orientation.z = q.getZ();
       imu_msg.orientation.w = q.getW();
-      
+
       imu_msg.orientation_covariance = {
         static_cast<double>(parameters_->pose_cov_list[3]), 0., 0.,
         0., static_cast<double>(parameters_->pose_cov_list[4]), 0.,
