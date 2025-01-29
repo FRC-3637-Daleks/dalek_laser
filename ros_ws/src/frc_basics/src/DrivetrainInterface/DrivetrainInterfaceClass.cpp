@@ -156,51 +156,54 @@ void DrivetrainInterfaceNode::pub_callback()
 
       pubTwist_.publish(twist_msg);
       // Odom
-      auto timestampOdom = table_->timestampOdomSub.GetAtomic();
-      ros::Time rostimeOdom;
-      rostimeOdom.fromNSec(timestampOdom.time*1000);
+      const auto updates = table_->timestampOdomSub.ReadQueue();
+      if (updates.size() != 0) {
+        auto timestampOdom = updates.back();
+        ros::Time rostimeOdom;
+        rostimeOdom.fromNSec(timestampOdom.time*1000);
 
-      nav_msgs::Odometry odom_msg;
-      std::vector<double> linear = table_->linearOdomSub.Get();
-      std::vector<double> angular = table_->angularOdomSub.Get();
-      odom_msg.header.frame_id = "odom";
-      odom_msg.child_frame_id = "base_footprint";
-      odom_msg.header.stamp = rostimeOdom;
-      odom_msg.twist = twist_msg.twist;
-      odom_msg.pose.pose.position.x  = linear[0];
-      odom_msg.pose.pose.position.y  = linear[1];
-      odom_msg.pose.pose.position.z  = linear[2];
+        nav_msgs::Odometry odom_msg;
+        std::vector<double> linear = table_->linearOdomSub.Get();
+        std::vector<double> angular = table_->angularOdomSub.Get();
+        odom_msg.header.frame_id = "odom";
+        odom_msg.child_frame_id = "base_footprint";
+        odom_msg.header.stamp = rostimeOdom;
+        odom_msg.twist = twist_msg.twist;
+        odom_msg.pose.pose.position.x  = linear[0];
+        odom_msg.pose.pose.position.y  = linear[1];
+        odom_msg.pose.pose.position.z  = linear[2];
 
-      tf2::Quaternion q;
-      q.setRPY(angular[0], angular[1], angular[2]);
-      odom_msg.pose.pose.orientation.x = q.getX();
-      odom_msg.pose.pose.orientation.y = q.getY();
-      odom_msg.pose.pose.orientation.z = q.getZ();
-      odom_msg.pose.pose.orientation.w = q.getW();
+        tf2::Quaternion q;
+        q.setRPY(angular[0], angular[1], angular[2]);
+        odom_msg.pose.pose.orientation.x = q.getX();
+        odom_msg.pose.pose.orientation.y = q.getY();
+        odom_msg.pose.pose.orientation.z = q.getZ();
+        odom_msg.pose.pose.orientation.w = q.getW();
 
-      odom_msg.pose.covariance = {
-        static_cast<double>(parameters_->pose_cov_list[0]), 0., 0., 0., 0., 0.,
-        0., static_cast<double>(parameters_->pose_cov_list[1]), 0., 0., 0., 0.,
-        0., 0., static_cast<double>(parameters_->pose_cov_list[2]), 0., 0., 0.,
-        0., 0., 0., static_cast<double>(parameters_->pose_cov_list[3]), 0., 0.,
-        0., 0., 0., 0., static_cast<double>(parameters_->pose_cov_list[4]), 0.,
-        0., 0., 0., 0., 0., static_cast<double>(parameters_->pose_cov_list[5]) };
+        odom_msg.pose.covariance = {
+          static_cast<double>(parameters_->pose_cov_list[0]), 0., 0., 0., 0., 0.,
+          0., static_cast<double>(parameters_->pose_cov_list[1]), 0., 0., 0., 0.,
+          0., 0., static_cast<double>(parameters_->pose_cov_list[2]), 0., 0., 0.,
+          0., 0., 0., static_cast<double>(parameters_->pose_cov_list[3]), 0., 0.,
+          0., 0., 0., 0., static_cast<double>(parameters_->pose_cov_list[4]), 0.,
+          0., 0., 0., 0., 0., static_cast<double>(parameters_->pose_cov_list[5]) };
 
-      pubOdom_.publish(odom_msg);
+        pubOdom_.publish(odom_msg);
 
-      geometry_msgs::TransformStamped tf_odom_to_base;
-      tf_odom_to_base.header.stamp = odom_msg.header.stamp;
-      tf_odom_to_base.header.frame_id = "odom";
-      tf_odom_to_base.child_frame_id = "base_footprint";
-      tf_odom_to_base.transform.translation.x = linear[0];
-      tf_odom_to_base.transform.translation.y = linear[1];
-      tf_odom_to_base.transform.translation.z = linear[2];
-      tf_odom_to_base.transform.rotation.x = q.x();
-      tf_odom_to_base.transform.rotation.y = q.y();
-      tf_odom_to_base.transform.rotation.z = q.z();
-      tf_odom_to_base.transform.rotation.w = q.w();
+        geometry_msgs::TransformStamped tf_odom_to_base;
+        tf_odom_to_base.header.stamp = odom_msg.header.stamp;
+        tf_odom_to_base.header.frame_id = "odom";
+        tf_odom_to_base.child_frame_id = "base_footprint";
+        tf_odom_to_base.transform.translation.x = linear[0];
+        tf_odom_to_base.transform.translation.y = linear[1];
+        tf_odom_to_base.transform.translation.z = linear[2];
+        tf_odom_to_base.transform.rotation.x = q.x();
+        tf_odom_to_base.transform.rotation.y = q.y();
+        tf_odom_to_base.transform.rotation.z = q.z();
+        tf_odom_to_base.transform.rotation.w = q.w();
 
-      tf_br_.sendTransform(tf_odom_to_base);
+        tf_br_.sendTransform(tf_odom_to_base);
+      }
     }
 
     if(pubSim_.getNumSubscribers() > 0)
