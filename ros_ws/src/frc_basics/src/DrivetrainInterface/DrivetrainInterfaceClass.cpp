@@ -23,6 +23,7 @@ DrivetrainInterfaceNode::DrivetrainInterfaceNode(const ros::NodeHandle& _node_ha
   ROS_INFO_STREAM("  start publishers");
   pubTwist_ = nh_.advertise<geometry_msgs::TwistWithCovarianceStamped>("nt2ros/twist", 10);
   pubOdom_  = nh_.advertise<nav_msgs::Odometry>("nt2ros/odom", 10);
+  pubSim_   = nh_.advertise<geometry_msgs::PoseStamped>("nt2ros/sim_pose", 10);
   pubImu_   = nh_.advertise<sensor_msgs::Imu>("nt2ros/imu", 10);
   pubMotors_ = nh_.advertise<frc_msgs::Motors>("nt2ros/motors", 10);
 
@@ -54,20 +55,21 @@ void DrivetrainInterfaceNode::subTwist_callback(const geometry_msgs::Twist::Cons
   }
 }
 
-void DrivetrainInterfaceNode::subOdom_callback(const nav_msgs::Odometry::ConstPtr& message)
+void DrivetrainInterfaceNode::subOdom_callback(const nav_msgs::Odometry::ConstPtr&)
 {
   if(table_->IsConnected())
   {
+    // TODO: Publish current tf state
+    /*
     ros::Time stamp = message->header.stamp;
     int64_t timestamp = stamp.toNSec();
-    table_->timestampOdomPub.Set(timestamp / 1000);
-
+    table_->timestampPosePub.Set(timestamp / 1000);
 
     std::vector<double> linear = {message->pose.pose.position.x, message->pose.pose.position.y, message->pose.pose.position.z};
-    table_->linearOdomPub.Set(linear);
+    table_->linearPosePub.Set(linear);
 
     std::vector<double> linearVel = {message->twist.twist.linear.x, message->twist.twist.linear.y, message->twist.twist.linear.z};
-    table_->linearVelOdomPub.Set(linearVel);
+    table_->linearVelPosePub.Set(linearVel);
 
     tf2::Quaternion q;
     tf2::fromMsg(message->pose.pose.orientation, q);
@@ -75,7 +77,7 @@ void DrivetrainInterfaceNode::subOdom_callback(const nav_msgs::Odometry::ConstPt
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
     std::vector<double> angular = {roll, pitch, yaw};
-    table_->angularOdomPub.Set(angular);
+    table_->angularPosePub.Set(angular);
 
     tf2::Quaternion qVel;
     tf2::fromMsg(message->pose.pose.orientation, qVel);
@@ -83,9 +85,10 @@ void DrivetrainInterfaceNode::subOdom_callback(const nav_msgs::Odometry::ConstPt
     double rollVel, pitchVel, yawVel;
     mVel.getRPY(rollVel, pitchVel, yawVel);
     std::vector<double> angularVel = {rollVel, pitchVel, yawVel};
-    table_->angularVelOdomPub.Set(angularVel);
+    table_->angularVelPosePub.Set(angularVel);
 
     table_->Flush();
+    */
   }
   else
   {
@@ -199,6 +202,35 @@ void DrivetrainInterfaceNode::pub_callback()
 
       tf_br_.sendTransform(tf_odom_to_base);
     }
+
+    if(pubSim_.getNumSubscribers() > 0)
+    {
+      auto timestampSim = table_->timestampSimSub.GetAtomic();
+      ros::Time rostimeSim;
+      rostimeSim.fromNSec(timestampSim.time*1000);
+
+      geometry_msgs::PoseStamped pose_msg;
+      pose_msg.header.frame_id = "world";
+      pose_msg.header.stamp = rostimeSim;
+
+      std::vector<double> posLinear = table_->simPoseLinearSub.Get();
+      std::vector<double> posAngular = table_->simPoseAngularSub.Get();
+
+      pose_msg.pose.position.x = posLinear[0];
+      pose_msg.pose.position.y = posLinear[1];
+      pose_msg.pose.position.z = posLinear[2];
+
+      tf2::Quaternion q;
+      q.setRPY(posAngular[0], posAngular[1], posAngular[2]);
+
+      pose_msg.pose.orientation.x = q.x();
+      pose_msg.pose.orientation.y = q.y();
+      pose_msg.pose.orientation.z = q.z();
+      pose_msg.pose.orientation.w = q.w();
+
+      pubSim_.publish(pose_msg);
+    }
+
     // IMU
     if(pubImu_.getNumSubscribers() > 0)
     {

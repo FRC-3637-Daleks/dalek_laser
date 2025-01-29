@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="model_name" default="lidar_stand"/>
+
+    <node name="model_spawner" pkg="gazebo_ros" type="spawn_model"
+        args="-x 1 -y 1 -z 2 -Y 0 -b -sdf -model $(arg model_name) -file $(find frc_sim_gazebo)/models/robot/lidar_stand/model.sdf">
+    </node>
+
+    <node name="robot_pose_updater" pkg="frc_sim_gazebo" type="update_gazebo_pose.py" output="screen">
+        <param name="model_name" value="$(arg model_name)"/>
+        <remap from="/sim/ground_truth" to="/frc/drivetrain/nt2ros/sim_pose"/>
+    </node>
+    <node name="scan_republisher" pkg="frc_sim_gazebo" type="republish_laser_now.py" output="screen">
+    </node>
+
+</launch>

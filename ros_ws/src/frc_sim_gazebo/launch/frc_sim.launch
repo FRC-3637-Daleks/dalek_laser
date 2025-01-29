@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="world" default="reefscape"/>
+    <arg name="model_name" default="lidar_stand"/>
+
+    <include file="$(find frc_sim_gazebo)/launch/frc_world.launch">
+        <arg name="use_sim_time" value="false"/>
+    </include>
+    <include file="$(find frc_sim_gazebo)/launch/spawn_robot.launch"/>
+</launch>

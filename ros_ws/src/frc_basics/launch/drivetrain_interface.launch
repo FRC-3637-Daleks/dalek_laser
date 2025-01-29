@@ -15,5 +15,9 @@
     <param name="hostname"          value="$(arg hostname)" if="$(eval arg('hostname') != '')"/>
     <param name="port"              value="$(arg port)" if="$(eval arg('port') != '')"/>
   </node>
+  <node pkg="tf" type="static_transform_publisher" name="base_to_laser"
+        args="-0.3175 0.3175 0.15 0 0 0 base_footprint laser 100"
+        respawn="true">
+   </node>
 
 </launch>

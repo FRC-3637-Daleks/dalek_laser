@@ -39,6 +39,7 @@ class DrivetrainInterfaceNode
     ros::Timer pubTimer_;
     ros::Publisher pubTwist_;
     ros::Publisher pubOdom_;
+    ros::Publisher pubSim_;
     ros::Publisher pubImu_;
     ros::Publisher pubMotors_;
 

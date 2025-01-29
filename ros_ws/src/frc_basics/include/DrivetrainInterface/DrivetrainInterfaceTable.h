@@ -20,14 +20,14 @@ class DrivetrainInterfaceTable
   public:
 
     DrivetrainInterfaceTable(const std::string& _node_name, const std::string& _nt_table, const int& _team_number, const std::string& _hostname, const unsigned int& _port);
-    
+
     std::shared_ptr<nt::NetworkTable> drivetrainTable;
 
-    nt::IntegerPublisher timestampOdomPub;
-    nt::DoubleArrayPublisher linearOdomPub;
-    nt::DoubleArrayPublisher angularOdomPub;
-    nt::DoubleArrayPublisher linearVelOdomPub;
-    nt::DoubleArrayPublisher angularVelOdomPub;
+    nt::IntegerPublisher timestampPosePub;
+    nt::DoubleArrayPublisher linearPosePub;
+    nt::DoubleArrayPublisher angularPosePub;
+    nt::DoubleArrayPublisher linearCorrectionPub;
+    nt::DoubleArrayPublisher angularCorrectionPub;
 
     nt::IntegerPublisher timestampTwistPub;
     nt::DoubleArrayPublisher linearTwistPub;
@@ -44,16 +44,21 @@ class DrivetrainInterfaceTable
     nt::DoubleArraySubscriber voltageMotorSub;
     nt::DoubleArraySubscriber currentMotorSub;
     nt::DoubleArraySubscriber pwmRatioMotorSub;
-    nt::DoubleArraySubscriber tempMotorSub;    
+    nt::DoubleArraySubscriber tempMotorSub;
     nt::DoubleArraySubscriber angleMotorSub;
     nt::DoubleArraySubscriber rateMotorSub;
+
+    nt::IntegerSubscriber timestampSimSub;
+    nt::DoubleArraySubscriber simPoseLinearSub;
+    nt::DoubleArraySubscriber simPoseAngularSub;
+
 
     bool IsConnected();
 
     void Flush();
 
   private:
-    
+
     nt::NetworkTableInstance inst_;
 
 };

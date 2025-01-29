@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <scene>
+      <shadows>false</shadows>
+    </scene>
+    <gui fullscreen="0">
+      <camera name="user_camera">
+        <pose frame="">0 0 0 0 1.57 1.57</pose>
+      </camera>
+    </gui>
+    <physics name="default_physics" default="0" type="ode">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>100</real_time_update_rate>
+    </physics>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://reefscape_field</uri>
+      <name>reefscape_field</name>
+    </include>
+  </world>
+</sdf>

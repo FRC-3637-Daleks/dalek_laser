@@ -10,7 +10,7 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait rplidar_ros rplidar_a2m12.launch
-    profiles: [lidar]
+    profiles: [mapping, matchplay]
     environment:
       ROS_HOSTNAME: scanner
       ROS_MASTER_URI: "http://rosmaster:11311"
@@ -23,7 +23,9 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - rosmaster
+      - sim
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
+    profiles: [mapping, matchplay, sim]
     environment:
       ROS_HOSTNAME: nt_bridge
       ROS_MASTER_URI: "http://rosmaster:11311"
@@ -37,7 +39,7 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait bag_manager auto_bagger.launch
-    profiles: [lidar, bagger]
+    profiles: [mapping, matchplay]
     environment:
       ROS_HOSTNAME: bagger
       ROS_MASTER_URI: "http://rosmaster:11311"
@@ -51,17 +53,45 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait bag_manager play_with_tf.launch bag_file_str:="${BAG_FILE_STR}"
-    profiles: [replay]
+    profiles: [playback]
     environment:
       ROS_HOSTNAME: bag_player
       ROS_MASTER_URI: "http://rosmaster:11311"
     volumes:
       - bags:/bags
+  rviz:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+    command: rosrun rviz rviz -d /ros_ws/src/bag_manager/view_bag.rviz
+    profiles: [visualization]
+    environment:
+      ROS_HOSTNAME: rviz
+      ROS_MASTER_URI: "http://rosmaster:11311"
+      DISPLAY: ${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+  sim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+    command: roslaunch --wait frc_sim_gazebo frc_sim.launch
+    profiles: [sim]
+    environment:
+      ROS_HOSTNAME: sim
+      ROS_MASTER_URI: "http://rosmaster:11311"
+      DISPLAY: ${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
   photonvision:
     build:
       context: photonvision
       dockerfile: Dockerfile
-    profiles: [cameras]
+    profiles: [photonvision]
     extra_hosts:
       - "nt.server:${NT_SERVER:-host-gateway}"
     ports:

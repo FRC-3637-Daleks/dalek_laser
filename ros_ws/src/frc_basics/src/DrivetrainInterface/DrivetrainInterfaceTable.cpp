@@ -8,7 +8,7 @@ DrivetrainInterfaceTable::DrivetrainInterfaceTable(const std::string& _node_name
   if(_hostname != "" )
     // ROS_INFO_STREAM("Setting up DrivetrainInterface NT subscriber by hostname.");
     // ROS_INFO_STREAM("  Hostname: " << *_hostname);
-    // ROS_INFO_STREAM("  Port: " << *_port); 
+    // ROS_INFO_STREAM("  Port: " << *_port);
 
     inst_.SetServer(_hostname.c_str(), _port);
   else
@@ -22,22 +22,22 @@ DrivetrainInterfaceTable::DrivetrainInterfaceTable(const std::string& _node_name
 
   // ROS_INFO_STREAM("  Finding table " << _nt_table);
   drivetrainTable = inst_.GetTable(_nt_table);
-  
-  // Odom Pub
-  timestampOdomPub = drivetrainTable->GetIntegerTopic("ros2nt/odom/timestamp").Publish();
-  linearOdomPub    = drivetrainTable->GetDoubleArrayTopic("ros2nt/odom/position/linear").Publish();
-  angularOdomPub   = drivetrainTable->GetDoubleArrayTopic("ros2nt/odom/position/angular").Publish();
-  linearVelOdomPub = drivetrainTable->GetDoubleArrayTopic("ros2nt/odom/velocity/linear").Publish();
-  angularVelOdomPub= drivetrainTable->GetDoubleArrayTopic("ros2nt/odom/velocity/angular").Publish();
+
+  // Pose Pub
+  timestampPosePub = drivetrainTable->GetIntegerTopic("ros2nt/map2odom/timestamp").Publish();
+  linearPosePub    = drivetrainTable->GetDoubleArrayTopic("ros2nt/pose/linear").Publish();
+  angularPosePub   = drivetrainTable->GetDoubleArrayTopic("ros2nt/pose/angular").Publish();
+  linearCorrectionPub = drivetrainTable->GetDoubleArrayTopic("ros2nt/map2odom/linear").Publish();
+  angularCorrectionPub = drivetrainTable->GetDoubleArrayTopic("ros2nt/map2odom/angular").Publish();
 
   // Twist Pub
-  timestampTwistPub= drivetrainTable->GetIntegerTopic("ros2nt/twist/timestamp").Publish();  
+  timestampTwistPub= drivetrainTable->GetIntegerTopic("ros2nt/twist/timestamp").Publish();
   linearTwistPub   = drivetrainTable->GetDoubleArrayTopic("ros2nt/twist/velocity/linear").Publish();
   angularTwistPub  = drivetrainTable->GetDoubleArrayTopic("ros2nt/twist/velocity/angular").Publish();
 
   // Odom, Twist, IMU Sub
   std::vector<double> defaultDoubleValue = {0.0, 0.0, 0.0};
-  timestampOdomSub = drivetrainTable->GetIntegerTopic("nt2ros/odom/timestamp").Subscribe(0);  
+  timestampOdomSub = drivetrainTable->GetIntegerTopic("nt2ros/odom/timestamp").Subscribe(0);
   linearOdomSub    = drivetrainTable->GetDoubleArrayTopic("nt2ros/odom/position/linear").Subscribe(defaultDoubleValue);
   angularOdomSub   = drivetrainTable->GetDoubleArrayTopic("nt2ros/odom/position/angular").Subscribe(defaultDoubleValue);
   linearVelOdomSub = drivetrainTable->GetDoubleArrayTopic("nt2ros/odom/velocity/linear").Subscribe(defaultDoubleValue);
@@ -46,7 +46,7 @@ DrivetrainInterfaceTable::DrivetrainInterfaceTable(const std::string& _node_name
 
   // Motor Sub
   std::vector<int64_t> defaultIntValue = {0};
-  timestampMotorSub= drivetrainTable->GetIntegerTopic("nt2ros/motors/timestamp").Subscribe(0);    
+  timestampMotorSub= drivetrainTable->GetIntegerTopic("nt2ros/motors/timestamp").Subscribe(0);
   voltageMotorSub  = drivetrainTable->GetDoubleArrayTopic("nt2ros/motors/voltage").Subscribe(defaultDoubleValue);
   currentMotorSub  = drivetrainTable->GetDoubleArrayTopic("nt2ros/motors/current").Subscribe(defaultDoubleValue);
   pwmRatioMotorSub = drivetrainTable->GetDoubleArrayTopic("nt2ros/motors/pwm_ratio").Subscribe(defaultDoubleValue);
@@ -54,7 +54,11 @@ DrivetrainInterfaceTable::DrivetrainInterfaceTable(const std::string& _node_name
   angleMotorSub    = drivetrainTable->GetDoubleArrayTopic("nt2ros/motors/angle").Subscribe(defaultDoubleValue);
   rateMotorSub     = drivetrainTable->GetDoubleArrayTopic("nt2ros/motors/rate").Subscribe(defaultDoubleValue);
 
-  ROS_INFO_STREAM("  Connected!"); 
+  timestampSimSub = drivetrainTable->GetIntegerTopic("nt2ros/sim/timestamp").Subscribe(0);
+  simPoseLinearSub = drivetrainTable->GetDoubleArrayTopic("nt2ros/sim/position/linear").Subscribe(defaultDoubleValue);
+  simPoseAngularSub = drivetrainTable->GetDoubleArrayTopic("nt2ros/sim/position/angular").Subscribe(defaultDoubleValue);
+
+  ROS_INFO_STREAM("  Connected!");
 }
 
 bool DrivetrainInterfaceTable::IsConnected()
