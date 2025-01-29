@@ -8,6 +8,7 @@ from sensor_msgs.msg import LaserScan
 def laser_scan_callback(msg):
     # Modify the timestamp of the original message
     msg.header.stamp = rospy.Time.now()
+    msg.header.stamp -= rospy.Duration(rospy.get_param("~repub_latency", 0.0))
 
     # Publish the modified message
     pub.publish(msg)

@@ -1,20 +1,20 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="reefscape_field">
-    <pose>8.75 4.0 0 0 0 1.57079631</pose>
+    <pose>8.75 4.0 0 0 0 0</pose>
     <static>true</static>
     <link name="link">
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>model://reefscape_field/meshes/REEFSCAPE-SuperMinimal.dae</uri>
+            <uri>model://reefscape_field/meshes/REEFSCAPE-Wallless-Minimal.dae</uri>
           </mesh>
         </geometry>
       </visual>
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://reefscape_field/meshes/REEFSCAPE-SuperMinimal.dae</uri>
+            <uri>model://reefscape_field/meshes/REEFSCAPE-Wallless-Minimal.dae</uri>
           </mesh>
         </geometry>
         <max_contacts>10</max_contacts>
