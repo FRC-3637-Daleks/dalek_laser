@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>bag_manager</name>
+  <name>laser_filter</name>
   <version>0.0.0</version>
-  <description>Passive bag collection and managing system</description>
+  <description>The laser_filter package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="eric.ward@nokia-bell-labs.com">eward</maintainer>
+  <maintainer email="dan@todo.todo">dan</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/bag_manager</url> -->
+  <!-- <url type="website">http://wiki.ros.org/laser_filter</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
@@ -49,14 +49,18 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rosbag</build_depend>
-  <build_export_depend>rosbag</build_export_depend>
-  <exec_depend>rosbag</exec_depend>
-  <depend>tf</depend>
-  <depend>roscpp</depend>
-  <depend>nav_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>rviz</depend>
+  <build_depend>laser_filters</build_depend>
+  <build_depend>laser_geometry</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_export_depend>laser_filters</build_export_depend>
+  <build_export_depend>laser_geometry</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <exec_depend>laser_filters</exec_depend>
+  <exec_depend>laser_geometry</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
