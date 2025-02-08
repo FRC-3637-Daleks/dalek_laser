@@ -10,12 +10,12 @@
         output="screen">
     </node>
 
-    <node pkg="bag_manager" type="odometry_republisher_node" name="odom_to_base"
+    <!--node pkg="bag_manager" type="odometry_republisher_node" name="odom_to_base"
         respawn="true">
         <remap from="odom" to="/frc/drivetrain/nt2ros/odom"/>
     </node>
     <node pkg="tf" type="static_transform_publisher" name="base_to_laser"
         args="-0.3175 0.3175 0.15 0 0 0 base_footprint laser 100"
         respawn="true">
-    </node>
+    </node-->
 </launch>

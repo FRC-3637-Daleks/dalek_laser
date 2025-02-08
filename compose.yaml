@@ -17,6 +17,31 @@ services:
     devices:
       - /dev/ttyUSB0 # dont forget to make sure this has proper permissions
     restart: unless-stopped
+  slam:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+      - bag_player
+    command: roslaunch --wait slam_toolbox offline.launch
+    profiles: [slamp]
+    environment:
+      ROS_HOSTNAME: slam
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    restart: unless-stopped
+  filter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+    command: roslaunch --wait laser_filter t_laser_filter.launch
+    profiles: [filter]
+    environment:
+      ROS_HOSTNAME: filter
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    restart: unless-stopped
   nt_bridge:
     build:
       context: .
@@ -65,12 +90,14 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - rosmaster
+      - bag_player
     command: rosrun rviz rviz -d /ros_ws/src/bag_manager/view_bag.rviz
     profiles: [visualization]
     environment:
       ROS_HOSTNAME: rviz
       ROS_MASTER_URI: "http://rosmaster:11311"
       DISPLAY: ${DISPLAY}
+      LIBGL_ALWAYS_SOFTWARE: 1
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
   sim:
