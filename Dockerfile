@@ -18,7 +18,9 @@ RUN apt-get update && \
     libopencv-dev \
     default-jdk \
     gcc-11 \
-    g++-11 && \
+    g++-11 \
+    ros-noetic-sparse-bundle-adjustment \
+    ros-noetic-laser-filters && \ 
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.24.1/cmake-3.24.1-Linux-$(uname -m).sh \
