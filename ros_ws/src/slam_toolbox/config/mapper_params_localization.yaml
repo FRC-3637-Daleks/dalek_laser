@@ -10,8 +10,8 @@ ceres_loss_function: None
 odom_frame: odom
 map_frame: map
 base_frame: base_footprint
-scan_topic: /scan
-mode: mapping #localization
+scan_topic: /scan_filtered
+mode: localization
 
 # if you'd like to start localizing on bringup in a map and pose
 #map_file_name: test_steve
