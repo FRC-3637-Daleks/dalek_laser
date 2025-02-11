@@ -40,7 +40,7 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait laser_filter t_laser_filter.launch
-    profiles: [local-tool, slamp]
+    profiles: [local-tool, local-amcl, slamp]
     environment:
       ROS_HOSTNAME: filter
       ROS_MASTER_URI: "http://rosmaster:11311"
@@ -65,11 +65,26 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - rosmaster
-      - filter
-    command: ls
+      - filter  
+      #- map-loader
+    command: roslaunch --wait amcl amcl_diff.launch
     profiles: [local-amcl]
     environment:
-      ROS_HOSTNAME: localization-tool
+      ROS_HOSTNAME: localization-amcl
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    volumes:
+    - map:/map
+  map-loader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+      - filter  
+    command: rosrun map_server map_server /map/map.yaml
+    profiles: [not-working-:(]
+    environment:
+      ROS_HOSTNAME: map-loader
       ROS_MASTER_URI: "http://rosmaster:11311"
     volumes:
       - map:/map
@@ -132,6 +147,7 @@ services:
       LIBGL_ALWAYS_SOFTWARE: 1
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - map:/map #for testing beacuse amcl crashing
   sim:
     build:
       context: .
