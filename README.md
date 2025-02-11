@@ -121,3 +121,16 @@ Mostly useful for simulation.
 - [ ] Feed localization back to ros2nt topics to use on the robot
 - [ ] Implement dynamic obstacle detection/identification
 - [ ] Implement multi-scanner processing
+
+### CMD
+#### Run
+BAG_FILE_STR=sim_nowalls.bag docker compose --profile playback --profile visualization --profile slamp up
+#### Build
+BAG_FILE_STR=sim_nowalls.bag docker compose --profile playback --profile visualization --profile slamp build
+#### Exec
+```
+docker compose --profile playback --profile visualizaiton --profile filter --profile slamp exec bag_player bash
+
+source devel/setup.bash
+
+```

@@ -20,6 +20,7 @@ RUN apt-get update && \
     gcc-11 \
     g++-11 \
     ros-noetic-sparse-bundle-adjustment \
+    ros-noetic-map-server \
     ros-noetic-laser-filters && \ 
     rm -rf /var/lib/apt/lists/*
 

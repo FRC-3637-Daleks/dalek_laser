@@ -24,11 +24,14 @@ services:
     depends_on:
       - rosmaster
       - bag_player
-    command: roslaunch --wait slam_toolbox offline.launch
+      - filter
+    command: roslaunch --wait slam_toolbox lifelong.launch
     profiles: [slamp]
     environment:
       ROS_HOSTNAME: slam
       ROS_MASTER_URI: "http://rosmaster:11311"
+    volumes:
+      - map:/map
     restart: unless-stopped
   filter:
     build:
@@ -37,10 +40,39 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait laser_filter t_laser_filter.launch
-    profiles: [filter]
+    profiles: [local-tool, slamp]
     environment:
       ROS_HOSTNAME: filter
       ROS_MASTER_URI: "http://rosmaster:11311"
+    restart: unless-stopped
+  localization-tool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+      - filter
+    command: roslaunch --wait slam_toolbox localization.launch
+    profiles: [local-tool]
+    environment:
+      ROS_HOSTNAME: localization-tool
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    volumes:
+      - map:/map
+  localization-amcl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+      - filter
+    command: ls
+    profiles: [local-amcl]
+    environment:
+      ROS_HOSTNAME: localization-tool
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    volumes:
+      - map:/map
     restart: unless-stopped
   nt_bridge:
     build:
@@ -142,3 +174,4 @@ volumes:
   data:
   bags:
   photonvision_config:
+  map:
