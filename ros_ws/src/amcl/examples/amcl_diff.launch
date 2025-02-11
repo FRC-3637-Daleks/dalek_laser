@@ -1,4 +1,6 @@
 <launch>
+<remap from="/scan" to="/scan_filtered"/>
+<node pkg="map_server" type="map_server" name="map_server" args="/map/map.yaml"> </node> 
 <node pkg="amcl" type="amcl" name="amcl" output="screen">
   <!-- Publish scans from best pose at a max of 10 Hz -->
   <param name="odom_model_type" value="diff"/>
@@ -26,6 +28,7 @@
   <param name="update_min_d" value="0.2"/>
   <param name="update_min_a" value="0.5"/>
   <param name="odom_frame_id" value="odom"/>
+  <param name="base_frame_id" value="base_footprint"/>
   <param name="resample_interval" value="1"/>
   <param name="transform_tolerance" value="0.1"/>
   <param name="recovery_alpha_slow" value="0.0"/>
