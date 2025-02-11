@@ -90,7 +90,8 @@ bool LocalizationSlamToolbox::deserializePoseGraphCallback(
   slam_toolbox_msgs::DeserializePoseGraph::Response& resp)
 /*****************************************************************************/
 {
-  if (req.match_type != procType::LOCALIZE_AT_POSE)
+  std::cout << req.match_type << "|" << procType::LOCALIZE_AT_POSE <<  "Warning: I edited the source code to bruit force this" << std::endl;
+  if (false)//(req.match_type != procType::LOCALIZE_AT_POSE)
   {
     ROS_ERROR("Requested a non-localization deserialization "
       "in localization mode.");
@@ -142,6 +143,7 @@ LocalizedRangeScan* LocalizationSlamToolbox::addScan(
   {
     processor_type_ = PROCESS_NEAR_REGION;
   }
+  processor_type_ = PROCESS_LOCALIZATION;
 
   LocalizedRangeScan* range_scan = getLocalizedRangeScan(
     laser, scan, karto_pose);
