@@ -37,7 +37,7 @@ FROM build_environment AS wpilib_build
 RUN mkdir /wpilib
 WORKDIR /wpilib
 
-ADD https://github.com/wpilibsuite/allwpilib.git#v2025.0.0-alpha-2 /wpilib/allwpilib
+ADD https://github.com/wpilibsuite/allwpilib.git#v2025.3.1 /wpilib/allwpilib
 RUN mkdir build/
 RUN --mount=type=cache,target=build/ \
     cd build && \
