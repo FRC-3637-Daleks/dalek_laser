@@ -3,87 +3,40 @@ services:
     image: ros:noetic-ros-core
     command: roscore
     restart: unless-stopped
-  scanner:
+    network_mode: host
+  base_ros_service:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
       - rosmaster
+    network_mode: host
+    profiles: [_]
+    restart: unless-stopped
+  scanner:
+    extends: base_ros_service
     command: roslaunch --wait rplidar_ros rplidar_a2m12.launch
-    profiles: [mapping, matchplay]
-    environment:
-      ROS_HOSTNAME: scanner
-      ROS_MASTER_URI: "http://rosmaster:11311"
+    profiles: [matchplay]
     devices:
       - /dev/ttyUSB0 # dont forget to make sure this has proper permissions
-    restart: unless-stopped
   nt_bridge:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - rosmaster
-      - sim
+    extends: base_ros_service
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
-    profiles: [mapping, matchplay, sim]
-    environment:
-      ROS_HOSTNAME: nt_bridge
-      ROS_MASTER_URI: "http://rosmaster:11311"
+    profiles: [matchplay, sim]
     extra_hosts:
       - "nt.server:${NT_SERVER:-host-gateway}"
     restart: unless-stopped
   bagger:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - rosmaster
+    extends: base_ros_service
     command: roslaunch --wait bag_manager auto_bagger.launch
-    profiles: [mapping, matchplay]
-    environment:
-      ROS_HOSTNAME: bagger
-      ROS_MASTER_URI: "http://rosmaster:11311"
+    profiles: [matchplay]
     volumes:
       - bags:/bags
-    restart: unless-stopped
-  bag_player:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - rosmaster
-    command: roslaunch --wait bag_manager play_with_tf.launch bag_file_str:="${BAG_FILE_STR}"
-    profiles: [playback]
-    environment:
-      ROS_HOSTNAME: bag_player
-      ROS_MASTER_URI: "http://rosmaster:11311"
-    volumes:
-      - bags:/bags
-  rviz:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - rosmaster
-    command: rosrun rviz rviz -d /ros_ws/src/bag_manager/view_bag.rviz
-    profiles: [visualization]
-    environment:
-      ROS_HOSTNAME: rviz
-      ROS_MASTER_URI: "http://rosmaster:11311"
-      DISPLAY: ${DISPLAY}
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
   sim:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - rosmaster
+    extends: base_ros_service
     command: roslaunch --wait frc_sim_gazebo frc_sim.launch
     profiles: [sim]
     environment:
-      ROS_HOSTNAME: sim
-      ROS_MASTER_URI: "http://rosmaster:11311"
       DISPLAY: ${DISPLAY}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
@@ -99,7 +52,6 @@ services:
       - 1181-1190
     devices:
       - ${CAMERA_0:-/dev/null}
-      - ${CAMERA_1:-/dev/null}
     volumes:
       - photonvision_config:/opt/photonvision/photonvision_config
     restart: unless-stopped
@@ -115,3 +67,6 @@ volumes:
   data:
   bags:
   photonvision_config:
+networks:
+  ros:
+    driver: bridge
