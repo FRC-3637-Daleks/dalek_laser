@@ -59,6 +59,9 @@ RUN apt-get update && \
     python3-catkin-tools &&\
     rm -rf /var/lib/apt/lists/*
 
+#Needed package for some reason, sucks to install
+RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -y keyboard-configuration
+
 RUN rosdep init
 RUN apt-get update && \
     rosdep update && \
