@@ -40,7 +40,7 @@ services:
     depends_on:
       - rosmaster
     command: roslaunch --wait laser_filter t_laser_filter.launch
-    profiles: [local-tool, local-amcl, slamp]
+    profiles: [local-tool, local-amcl, slamp, olarta]
     environment:
       ROS_HOSTNAME: filter
       ROS_MASTER_URI: "http://rosmaster:11311"
@@ -71,6 +71,20 @@ services:
     profiles: [local-amcl]
     environment:
       ROS_HOSTNAME: localization-amcl
+      ROS_MASTER_URI: "http://rosmaster:11311"
+    volumes:
+    - map:/map
+  localization-olarta:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rosmaster
+      - filter  
+    command: roslaunch --wait olarta localize.launch
+    profiles: [olarta]
+    environment:
+      ROS_HOSTNAME: localization-olarta
       ROS_MASTER_URI: "http://rosmaster:11311"
     volumes:
     - map:/map
@@ -138,7 +152,7 @@ services:
     depends_on:
       - rosmaster
       - bag_player
-    command: rosrun rviz rviz -d /ros_ws/src/bag_manager/view_bag.rviz
+    command: rosrun rviz rviz -d /rviz/config.rviz || echo "Failed to load from /rviz" && rosrun rviz -d /ros_ws/src/bag_manager/view_bag.rviz
     profiles: [visualization]
     environment:
       ROS_HOSTNAME: rviz
@@ -148,6 +162,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - map:/map #for testing beacuse amcl crashing
+      - rviz:/rviz
   sim:
     build:
       context: .
@@ -191,3 +206,4 @@ volumes:
   bags:
   photonvision_config:
   map:
+  rviz:
