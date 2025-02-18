@@ -121,3 +121,22 @@ Mostly useful for simulation.
 - [ ] Feed localization back to ros2nt topics to use on the robot
 - [ ] Implement dynamic obstacle detection/identification
 - [ ] Implement multi-scanner processing
+
+## Usefull commands
+```
+#Run to build and run
+sudo docker compose build
+sudo docker compose --profile (name) up
+
+#Run once ran
+source /opt/ros/noetic/setup.bash
+rosrun rviz rviz
+or 
+rosrun rviz rviz -d /path/to/config.rviz
+
+rosbag play --clock -l /path/to/bag/name.bag
+
+#Run if need to make
+catkin_make
+
+```
