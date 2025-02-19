@@ -134,7 +134,7 @@ rosrun rviz rviz
 or 
 rosrun rviz rviz -d /path/to/config.rviz
 
-rosbag play --clock -l /path/to/bag/name.bag
+rosbag play --clock -l /path/to/bag/name.bag # play before rviz
 
 #Run if need to make
 catkin_make

@@ -19,6 +19,22 @@ services:
     profiles: [matchplay]
     devices:
       - /dev/ttyUSB0 # dont forget to make sure this has proper permissions
+  filter:
+    extends: base_ros_service
+    command: roslaunch --wait laser_filter t_laser_filter.launch
+    profiles: [slam, olarta]
+  slam:
+    extends: base_ros_service
+    command: roslaunch --wait slam_toolbox lifelong.launch
+    profiles: [slam]
+    depends_on:
+      - filter
+  olarta:
+    extends: base_ros_service
+    command: roslaunch --wait olarta localize.launch
+    profiles: [olarta]
+    depends_on:
+      - filter
   nt_bridge:
     extends: base_ros_service
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
