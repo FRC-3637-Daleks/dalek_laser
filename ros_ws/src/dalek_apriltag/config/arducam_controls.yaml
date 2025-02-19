@@ -1,0 +1,4 @@
+intrinsic_controls:
+  exposure_auto: 1
+  exposure_absolute: 0
+  brightness: 32

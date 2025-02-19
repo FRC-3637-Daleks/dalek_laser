@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="name" default="arducam" />
+    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_detector" required="true">
+        <remap from="image_rect" to="$(arg name)/image_rect" />
+        <remap from="camera_info" to="$(arg name)/camera_info" />
+        <param name="publish_tag_detections_image" value="true" />
+        <param name="publish_tf" value="true" />
+        <rosparam command="load" file="$(find dalek_apriltag)/config/tags.yaml"/>
+    </node>
+</launch>
