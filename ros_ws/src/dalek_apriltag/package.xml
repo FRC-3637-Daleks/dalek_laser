@@ -53,14 +53,17 @@
   <build_depend>camera_calibration</build_depend>
   <build_depend>image_proc</build_depend>
   <build_depend>usb_cam</build_depend>
+  <build_depend>compressed_image_transport</build_depend  >
   <build_export_depend>apriltag_ros</build_export_depend>
   <build_export_depend>camera_calibration</build_export_depend>
   <build_export_depend>image_proc</build_export_depend>
   <build_export_depend>usb_cam</build_export_depend>
+  <build_export_depend>compressed_image_transport</build_export_depend>
   <exec_depend>apriltag_ros</exec_depend>
   <exec_depend>camera_calibration</exec_depend>
   <exec_depend>image_proc</exec_depend>
   <exec_depend>usb_cam</exec_depend>
+  <exec_depend>compressed_image_transport</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

@@ -3,7 +3,7 @@
     <arg name="duration_per" default="20m" />
     <arg name="bag_dir" default="/bags" />
     <node pkg="rosbag" type="record" name="autobagger"
-        args="-x '/clock' -a -p -o $(arg bag_dir)/auto --split --duration $(arg duration_per) --max-splits $(arg max_splits) --lz4"
+        args="-x '(/clock)|(.*image_raw)' -a -p -o $(arg bag_dir)/auto --split --duration $(arg duration_per) --max-splits $(arg max_splits) --lz4"
         respawn="true"
     >
     </node>
