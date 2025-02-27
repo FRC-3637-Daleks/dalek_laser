@@ -1,0 +1,5 @@
+# .dockerignore
+ros_ws/build
+ros_ws/devel
+.git
+ros_ws/src/*/.git
