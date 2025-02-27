@@ -2,7 +2,7 @@
 <launch>
     <arg name="rectify" default="false" />
     <arg name="name" default="arducam" />
-    <node pkg="usb_cam" type="usb_cam_node" name="$(arg name)" required="true">
+    <node pkg="usb_cam" type="usb_cam_node" name="$(arg name)" required="true" output="screen">
         <param name="video_device" value="/dev/video0" />
         <param name="io_method" value="userptr" />
         <param name="pixel_format" value="yuyv" />

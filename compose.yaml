@@ -19,6 +19,12 @@ services:
     profiles: [matchplay]
     devices:
       - /dev/ttyUSB0 # dont forget to make sure this has proper permissions
+  camera:
+    extends: base_ros_service
+    command: roslaunch --wait dalek_apriltag publish_arducam.launch
+    profiles: [matchplay, vision]
+    devices:
+      - /dev/video0
   filter:
     extends: base_ros_service
     command: roslaunch --wait laser_filter t_laser_filter.launch
