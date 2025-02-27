@@ -62,7 +62,14 @@ services:
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+    restart: always
+  filebrowser: # Web UI for downloading/uploading files
+    image: filebrowser/filebrowser
+    ports:
+      - 5802:80
+    volumes:
+      - bags:/srv/bags
+    restart: always
 volumes:
   data:
   bags:
