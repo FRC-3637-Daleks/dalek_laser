@@ -1,0 +1,76 @@
+standalone_tags:
+  [
+    {id: 1, size: 0.17, name: "red_left_coral_station"},
+    {id: 2, size: 0.17, name: "red_right_coral_station"},
+    {id: 3, size: 0.17, name: "red_processor"},
+    {id: 4, size: 0.17, name: "red_right_barge"},
+    {id: 5, size: 0.17, name: "red_left_barge"},
+    {id: 6, size: 0.17, name: "red_reef_kl"},
+    {id: 7, size: 0.17, name: "red_reef_ab"},
+    {id: 8, size: 0.17, name: "red_reef_cd"},
+    {id: 9, size: 0.17, name: "red_reef_ef"},
+    {id: 10, size: 0.17, name: "red_reef_gh"},
+    {id: 11, size: 0.17, name: "red_reef_ij"},
+    {id: 12, size: 0.17, name: "blue_right_coral_station"},
+    {id: 13, size: 0.17, name: "blue_left_coral_station"},
+    {id: 14, size: 0.17, name: "blue_left_barge"},
+    {id: 15, size: 0.17, name: "blue_right_barge"},
+    {id: 16, size: 0.17, name: "blue_processor"},
+    {id: 17, size: 0.17, name: "blue_reef_cd"},
+    {id: 18, size: 0.17, name: "blue_reef_ab"},
+    {id: 19, size: 0.17, name: "blue_reef_kl"},
+    {id: 20, size: 0.17, name: "blue_reef_ij"},
+    {id: 21, size: 0.17, name: "blue_reef_gh"},
+    {id: 22, size: 0.17, name: "blue_reef_ef"}
+  ]
+tag_bundles:
+  [
+    {
+      name: "blue_reef",
+      layout:
+        [
+          {id: 17, size: 0.17, x: -0.4154, y: -0.7196, z: 0.3081, qw: -0.5, qz: -0.866},
+          {id: 18, size: 0.17, x: -0.8317, y: 0,       z: 0.3081, qw: -1.0, qz: 0},
+          {id: 19, size: 0.17, x: -0.4154, y: 0.7196,  z: 0.3081, qw: -0.5, qz: 0.866},
+          {id: 20, size: 0.17, x:  0.4154, y: 0.7196,  z: 0.3081, qw: 0.5,  qz: 0.866},
+          {id: 21, size: 0.17, x: 0.8317,  y: 0.0,     z: 0.3081, qw: 1.0, qz: 0},
+          {id: 22, size: 0.17, x: 0.4154,  y: -0.7196, z: 0.3081, qw: -0.5, qz: -0.866}
+        ]
+    },
+    {
+      name: "red_reef",
+      layout:
+        [
+          {id: 11, size: 0.17, x: -0.4154, y: -0.7196, z: 0.3081, qw: -0.5, qz: -0.866},
+          {id: 10, size: 0.17, x: -0.8317, y: 0,       z: 0.3081, qw: -1.0, qz: 0},
+          {id: 9, size: 0.17, x: -0.4154, y: 0.7196,  z: 0.3081, qw: -0.5, qz: 0.866},
+          {id: 8, size: 0.17, x:  0.4154, y: 0.7196,  z: 0.3081, qw: 0.5,  qz: 0.866},
+          {id: 7, size: 0.17, x: 0.8317,  y: 0.0,     z: 0.3081, qw: 1.0, qz: 0},
+          {id: 6, size: 0.17, x: 0.4154,  y: -0.7196, z: 0.3081, qw: -0.5, qz: -0.866}
+        ]
+    },
+    {
+      name: "full_field",
+      layout:
+        [
+          {id: 1, size: 0.17, x: 16.697198, y: 0.65532, z: 1.4859, qw: -0.5877852523, qz: 0.8090169944},
+          {id: 2, size: 0.17, x: 16.697198, y: 7.39648, z: 1.4859, qw: -0.5877852523, qz: -0.8090169944},
+          {id: 3, size: 0.17, x: 11.56081,  y: 8.05561, z: 1.30175, qw: 0, qz: -1},
+          {id: 6, size: 0.17, x: 13.474446, y: 3.306318, z: 0.308102, qw: 0.5, qz: -0.8660254038},
+          {id: 7, size: 0.17, x: 13.890498, y: 4.0259, z: 0.308102, qw: 1, qz: 0},
+          {id: 8, size: 0.17, x: 13.474446, y: 4.745482, z: 0.308102, qw: 0.5, qz: 0.8660254038},
+          {id: 9, size: 0.17, x: 12.643358, y: 4.745482, z: 0.308102, qw: -0.5, qz: 0.8660254038},
+          {id: 10, size: 0.17, x: 12.227306, y: 4.0259, z: 0.308102, qw: -1, qz: 0},
+          {id: 11, size: 0.17, x: 12.643358, y: 3.306318, z: 0.308102, qw: -0.5, qz: -0.8660254038},
+          {id: 12, size: 0.17, x: 0.851154, y: 0.65532, z: 1.4859, qw: 0.5877852523, qz: 0.8090169944},
+          {id: 13, size: 0.17, x: 0.851154, y: 7.39648, z: 1.4859, qw: 0.5877852523, qz: -0.8090169944},
+          {id: 16, size: 0.17, x: 5.987542, y: -0.00381, z: 1.30175, qw: 0, qz: 1},
+          {id: 17, size: 0.17, x: 4.073906, y: 3.306318, z: 0.308102, qw: -0.5, qz: -0.8660254038},
+          {id: 18, size: 0.17, x: 3.6576, y: 4.0259, z: 0.308102, qw: -1, qz: 0},
+          {id: 19, size: 0.17, x: 4.073906, y: 4.745482, z: 0.308102, qw: -0.5, qz: 0.8660254038},
+          {id: 20, size: 0.17, x: 4.90474, y: 4.745482, z: 0.308102, qw: 0.5, qz: 0.8660254038},
+          {id: 21, size: 0.17, x: 5.321046, y: 4.0259, z: 0.308102, qw: 1, qz: 0},
+          {id: 22, size: 0.17, x: 4.90474, y: 3.306318, z: 0.308102, qw: 0.5, qz: -0.8660254038}
+        ]
+    }
+  ]

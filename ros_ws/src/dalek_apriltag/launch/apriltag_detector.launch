@@ -6,6 +6,9 @@
         <remap from="camera_info" to="$(arg name)/camera_info" />
         <param name="publish_tag_detections_image" value="true" />
         <param name="publish_tf" value="true" />
-        <rosparam command="load" file="$(find dalek_apriltag)/config/tags.yaml"/>
+        <param name="tag_family" value="tag36h11"/>
+        <param name="transport_hint" value="compressed"/>
+        <param name="remove_duplicates" value="true"/>
+        <rosparam command="load" file="$(find dalek_apriltag)/config/reefscape.yaml"/>
     </node>
 </launch>

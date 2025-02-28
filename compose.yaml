@@ -41,6 +41,10 @@ services:
     profiles: [olarta]
     depends_on:
       - filter
+  apriltag:
+    extends: base_ros_service
+    command: roslaunch --wait dalek_apriltag apriltag_detector.launch
+    profiles: [apriltag]
   nt_bridge:
     extends: base_ros_service
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
