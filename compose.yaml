@@ -12,6 +12,8 @@ services:
       - rosmaster
     network_mode: host
     profiles: [_]
+    environment:
+      - ROS_IP=${ROS_IP:-host-gateway}
     restart: unless-stopped
   scanner:
     extends: base_ros_service
@@ -24,7 +26,7 @@ services:
     command: roslaunch --wait dalek_apriltag publish_arducam.launch
     profiles: [matchplay, vision]
     devices:
-      - /dev/video0
+      - /dev/video0:${APRILTAG_CAMERA:-/dev/video0}
   filter:
     extends: base_ros_service
     command: roslaunch --wait laser_filter t_laser_filter.launch
@@ -44,7 +46,7 @@ services:
   apriltag:
     extends: base_ros_service
     command: roslaunch --wait dalek_apriltag apriltag_detector.launch
-    profiles: [apriltag]
+    profiles: [vision]
   nt_bridge:
     extends: base_ros_service
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
