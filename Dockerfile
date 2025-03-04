@@ -21,7 +21,7 @@ RUN apt-get update && \
     g++-11 \
     ros-noetic-sparse-bundle-adjustment \
     ros-noetic-map-server \
-    ros-noetic-laser-filters && \ 
+    ros-noetic-laser-filters && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.24.1/cmake-3.24.1-Linux-$(uname -m).sh \
@@ -51,7 +51,6 @@ RUN --mount=type=cache,target=build/ \
 FROM build_environment
 
 WORKDIR /ros_ws
-COPY --parents ros_ws/src/*/package.xml /
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -62,11 +61,17 @@ RUN apt-get update && \
 #Needed package for some reason, sucks to install
 RUN apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -y keyboard-configuration
 
+COPY --parents ros_ws/src/*/package.xml /
+
 RUN rosdep init
-RUN apt-get update && \
+
+# Cache installed packages so we don't have to install everything from scratch
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean && \
+    apt-get update && \
     rosdep update && \
-    rosdep install --from-paths src --ignore-src -y && \
-    rm -rf /var/lib/apt/lists/*
+    rosdep install --from-paths src --ignore-src -y
 
 COPY --from=wpilib_build /usr/local/include/ /usr/local/include/
 COPY --from=wpilib_build /usr/local/lib/ /usr/local/lib/
