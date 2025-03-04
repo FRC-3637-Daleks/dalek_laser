@@ -13,7 +13,7 @@ services:
     network_mode: host
     profiles: [_]
     environment:
-      - ROS_IP=${ROS_IP:-host-gateway}
+      - ROS_IP
     restart: unless-stopped
   scanner:
     extends: base_ros_service
@@ -23,7 +23,7 @@ services:
       - /dev/ttyUSB0 # dont forget to make sure this has proper permissions
   camera:
     extends: base_ros_service
-    command: roslaunch --wait dalek_apriltag publish_arducam.launch
+    command: roslaunch --wait dalek_apriltag publish_arducam.launch rectify:=true
     profiles: [matchplay, vision]
     devices:
       - /dev/video0:${APRILTAG_CAMERA:-/dev/video0}
