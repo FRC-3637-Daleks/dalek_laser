@@ -101,6 +101,14 @@ The theory here is that correction against the apriltags doesn't need to occur o
 
 The camera is calibrated with files in the container, as well as configured (exposure, brightness settings, etc).
 These settings can be changed by modifying the config in the dalek_apriltag folder and rebuilding.
+To experiment with different camera setting stuff, you can ssh into the pi and use
+```
+v4l2-ctl --list-controls # show all avaialble controls and current settings
+sudo v4l2-ctl -c <parameter>=<value>
+```
+
+Some of these seem to have no effect but the ones I set in `arducam_controls.yaml` have some effect at least.
+
 Alternatively, you can make a new file outside the container and create a *bind mount* to inside the container, and then pass in a file argument pointing at the bound file so that you don't need to rebuild.
 
 Recalibration was done with http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration which you can run locally pointing your ROS_MASTER at the robot while tethered, or by connecting the camera over USB to a local machine and running the publisher there as well.
