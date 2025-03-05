@@ -27,6 +27,7 @@ services:
     profiles: [matchplay, vision]
     devices:
       - /dev/video0:${APRILTAG_CAMERA:-/dev/video0}
+    restart: unless-stopped
   filter:
     extends: base_ros_service
     command: roslaunch --wait laser_filter t_laser_filter.launch
@@ -45,8 +46,14 @@ services:
       - filter
   apriltag:
     extends: base_ros_service
-    command: roslaunch --wait dalek_apriltag apriltag_detector.launch no_uncertainty:=true
+    command: roslaunch --wait dalek_apriltag apriltag_detector.launch no_uncertainty:=false
     profiles: [matchplay, vision]
+    restart: unless-stopped
+  pose_fusion:
+    extends: base_ros_service
+    command: roslaunch --wait pose_fusion localize.launch
+    profiles: [matchplay]
+    restart: unless-stopped
   nt_bridge:
     extends: base_ros_service
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
@@ -56,7 +63,7 @@ services:
     restart: unless-stopped
   bagger:
     extends: base_ros_service
-    command: roslaunch --wait bag_manager auto_bagger.launch
+    command: roslaunch --wait bag_manager auto_bagger.launch record_camera:=false
     profiles: [matchplay]
     volumes:
       - bags:/bags

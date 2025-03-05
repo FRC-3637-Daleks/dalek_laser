@@ -24,7 +24,7 @@
     <!-- The "full_field" transform is a tag_bundle with all the apriltags
         This static_transform makes the robot take the apriltag pose as gospel which may not be good-->
     <node if="$(arg no_uncertainty)" pkg="tf" type="static_transform_publisher" name="apriltag_exact"
-        args="0 0 0 0 0 0 full_field field_origin 100"
+        args="0 0 0 0 0 0 full_field map 100"
         respawn="true">
     </node>
 

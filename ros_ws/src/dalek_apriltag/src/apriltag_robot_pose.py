@@ -17,8 +17,11 @@ def main():
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
 
-    camera_frame = rospy.get_param("camera_frame_id", "arducam")
-    robot_frame = rospy.get_param("robot_frame_id", "base_footprint")
+    camera_frame = rospy.get_param("~camera_frame_id", "arducam")
+    robot_frame = rospy.get_param("~robot_frame_id", "base_footprint")
+    dist_err_per_m = float(rospy.get_param("~dist_err_per_m", "0.03"))
+    angle_err_per_m = float(rospy.get_param("~angle_err_per_m", "0.1"))
+    x_y_err_ratio = float(rospy.get_param("~x_y_err_ratio", "4.0"))
 
     pub = rospy.Publisher("apriltag/pose", PoseWithCovarianceStamped, queue_size=1)
 
@@ -49,17 +52,17 @@ def main():
 
         dist_score = 0.67*closest_dist + 0.33*avg_dist
         # every 1m away 3cm of error std_dev we'll say
-        a = 0.3*dist_score
+        a = dist_err_per_m*dist_score
         aa = a*a
 
         # every 1m away 0.1 radians of error std_dev we'll say
-        b = 0.1*dist_score
+        b = angle_err_per_m*dist_score
         bb = b*b
 
         ab = a*b
 
         detection_covariance = numpy.array([
-            [4*aa,0, 0, 0, 0, 0], # Harder to estimate distance to tags
+            [x_y_err_ratio*aa,0, 0, 0, 0, 0], # Harder to estimate distance to tags
             [0, aa,0, 0, 0, ab],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
