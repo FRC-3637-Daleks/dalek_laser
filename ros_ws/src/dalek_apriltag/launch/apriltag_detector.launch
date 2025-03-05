@@ -1,14 +1,32 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="name" default="arducam" />
-    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_detector" required="true">
+    <arg name="no_uncertainty" default="false"/>
+    <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_detector" respawn="true">
         <remap from="image_rect" to="$(arg name)/image_rect" />
         <remap from="camera_info" to="$(arg name)/camera_info" />
-        <param name="publish_tag_detections_image" value="true" />
+        <param name="publish_tag_detections_image" value="false" />
         <param name="publish_tf" value="true" />
         <param name="tag_family" value="tag36h11"/>
-        <param name="transport_hint" value="compressed"/>
+        <param name="transport_hint" value="raw"/>
         <param name="remove_duplicates" value="true"/>
+        <param name="camera_frame" value="$(arg name)" />
         <rosparam command="load" file="$(find dalek_apriltag)/config/reefscape.yaml"/>
+        <!-- Lowers resolution of image for big speed-up -->
+        <param name="tag_decimate" value="4.0"/>
     </node>
+    <!-- Get CAD to give this for real. Can also calibrate with an apriltag mounted at a known pose -->
+    <node pkg="tf" type="static_transform_publisher" name="base_to_camera"
+        args="0.3175 0 0.15 0.5 -0.5 0.5 -0.5 base_footprint $(arg name) 100"
+        respawn="true">
+   </node>
+
+    <!-- The "full_field" transform is a tag_bundle with all the apriltags
+        This static_transform makes the robot take the apriltag pose as gospel which may not be good
+        Working on a node which publishes apriltag pose with covariance to fuse with other sources -->
+   <node if="$(arg no_uncertainty)" pkg="tf" type="static_transform_publisher" name="apriltag_exact"
+        args="0 0 0 0 0 0 full_field field_origin 100"
+        respawn="true">
+   </node>
+
 </launch>

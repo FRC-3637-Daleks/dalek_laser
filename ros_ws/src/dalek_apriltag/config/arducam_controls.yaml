@@ -1,4 +1,7 @@
 intrinsic_controls:
-  exposure_auto: 1
-  exposure_absolute: 0
-  brightness: 32
+  auto_exposure: 1
+  white_balance_automatic: 0
+  exposure_time_absolute: 300 #translates to 30ms
+  saturation: 100
+  brightness: 56
+  contrast: 20

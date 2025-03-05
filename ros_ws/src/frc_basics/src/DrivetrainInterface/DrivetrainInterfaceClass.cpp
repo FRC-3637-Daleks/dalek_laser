@@ -6,6 +6,7 @@ DrivetrainInterfaceNode::DrivetrainInterfaceNode(const ros::NodeHandle& _node_ha
               const ros::NodeHandle& _private_node_handle)
 : nh_(_node_handle)
 , pnh_(_private_node_handle)
+, tf_listen_(tf_buffer_)
 {
   ROS_INFO_STREAM("Initialize " << ros::this_node::getName());
 
@@ -127,7 +128,7 @@ void DrivetrainInterfaceNode::pub_callback()
     }
 
     // Twist and Odom
-    if(pubTwist_.getNumSubscribers() > 0 || pubOdom_.getNumSubscribers() > 0)
+    if(pubTwist_.getNumSubscribers() >= 0 || pubOdom_.getNumSubscribers() >= 0)
     {
       //Twist
       auto timestampTwist = table_->timestampOdomSub.GetAtomic();
@@ -206,7 +207,7 @@ void DrivetrainInterfaceNode::pub_callback()
       }
     }
 
-    if(pubSim_.getNumSubscribers() > 0)
+    if(pubSim_.getNumSubscribers() >= 0)
     {
       auto timestampSim = table_->timestampSimSub.GetAtomic();
       ros::Time rostimeSim;
@@ -279,6 +280,25 @@ void DrivetrainInterfaceNode::pub_callback()
 
       pubImu_.publish(imu_msg);
     }
+
+    if (tf_buffer_.canTransform("field_origin", "odom", ros::Time(0), ros::Duration(1.0))) {
+      const auto map_to_odom = tf_buffer_.lookupTransform("field_origin", "odom", ros::Time(0));
+      const auto transform = map_to_odom.transform;
+      std::vector<double> correctionLinear(3);
+      correctionLinear[0] = transform.translation.x;
+      correctionLinear[1] = transform.translation.y;
+      correctionLinear[2] = 0;
+      table_->linearCorrectionPub.Set(correctionLinear);
+
+      tf2::Quaternion quat;
+      tf2::fromMsg(transform.rotation, quat);
+      tf2::Matrix3x3 m(quat);
+
+      std::vector<double> correctionAngular(3);
+      m.getRPY(correctionAngular[0], correctionAngular[1], correctionAngular[2]);
+      table_->angularCorrectionPub.Set(correctionAngular);
+    }
+
 
   }
 }

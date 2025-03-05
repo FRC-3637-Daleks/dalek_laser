@@ -45,8 +45,8 @@ services:
       - filter
   apriltag:
     extends: base_ros_service
-    command: roslaunch --wait dalek_apriltag apriltag_detector.launch
-    profiles: [vision]
+    command: roslaunch --wait dalek_apriltag apriltag_detector.launch no_uncertainty:=true
+    profiles: [matchplay, vision]
   nt_bridge:
     extends: base_ros_service
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
