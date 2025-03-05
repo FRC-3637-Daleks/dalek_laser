@@ -13,20 +13,20 @@ This repo contains a ROS 1 workspace and a dockerfile and compose file for launc
 
 Most of the containers in `compose.yaml` are created from the same image which is the one built from `Dockerfile`. The only difference is what command is launched in the container. Each container launches a different roslaunch, corresponding to different services which can be started and stopped independently.
 
-To build everything, run
+To build for the robot
 
-    docker compose build
+    docker compose --profile matchplay build
 
 And to run it use
 
-    docker compose up -d
+    docker compose --profile matchplay up -d
 
 The -d lets it run in the background, otherwise you need to `^C` to gain control of the shell again but only after closing all the containers.
 
 If you make changes to a specific service, you can relaunch that specific container by rebuilding it with
 
-    docker compose build <service_name>
-    docker compose up -d
+    docker compose --profile matchplay build <service_name>
+    docker compose --profile matchplay up -d
 
 This will build `<service_name>` again and only take down and relaunch that service when you run `up` again.
 
@@ -34,7 +34,15 @@ To do the above on the coprocessor from a separate machine (dev laptop), you wan
 
     export DOCKER_HOST=tcp://10.36.37.xxx:2375
 
+or over ssh
+
+    export DOCKER_HOST=ssh://orangepi@10.36.37.xxx
+
 Take care in figuring out what the hostname of the coprocessor is or its IP address to use here.
+NOTE: the orangepi's address should be 10.36.37.12. If you are unable to ping this address, make sure you plug it into the ethernet port closest to the USB-C power port.
+May need to unplug and replug.
+
+Also, the latest commit of this repo should be cloned on the HOST OS of the orangepi and it should be launchable from there.
 
 ### Running with `.env` files
 
@@ -47,14 +55,10 @@ Here are the available profiles current:
  - cameras: runs photonvision
 
 Here are the variables used in the compose file
- - `COMPOSE_PROFILES`: space separated list of profiles to activate
- - `CAMERA_<N>`: if left empty, no camera will be mounted to photonvision. Otherwise, set this to the camera device photonvision should find. There are 2 of these but its easy to add more.
  - `NT_SERVER`: by default it will search localhost, but if this value is set, specifies the address of the network tables server. On a real robot, should be `10.36.37.2`
+ - `ROS_IP`: if left out, ROS will use dalekpi hostname. Setting this to `10.36.37.12` allows for querying ROS from off the robot.
 
 Here are the `.env` files currently available to use
- - `local.env`: leaves everything to default, use this to test without any of the sensors/cameras
- - `local_cam.env`: runs photonvision with 1 camera mounted
- - `local_scanner.env`: runs the scanner pipeline
  - `robot.env`: this is the configuration that should be used when deploying to the actual robot.
 
  To run with a specific env file, use the following command
@@ -86,6 +90,50 @@ This is unaltered from the rplidar_ros git repo for now, but I'm keeping it open
 
 This service just runs the scanner node, attaching the necessary hardware and publishing the scans to /scan.
 
+There is also a static transform published from this node which MUST be calibrated to match where the scanner is mounted to the robot.
+
+### camera
+
+This container runs the camera which it looks for at `/dev/video0`. You may need to `sudo chmod 666 /dev/video0` to give it access but this should only happen when the USB port changes, not every restart.
+
+This will publish both raw and rectified images on the `/arducam/*` topics (use `rostopic list` to see). You should always use the `compressed` versions when trying to view them. Note that it runs only at 5fps but with max resolution.
+The theory here is that correction against the apriltags doesn't need to occur often or recently, just regularly.
+
+The camera is calibrated with files in the container, as well as configured (exposure, brightness settings, etc).
+These settings can be changed by modifying the config in the dalek_apriltag folder and rebuilding.
+Alternatively, you can make a new file outside the container and create a *bind mount* to inside the container, and then pass in a file argument pointing at the bound file so that you don't need to rebuild.
+
+Recalibration was done with http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration which you can run locally pointing your ROS_MASTER at the robot while tethered, or by connecting the camera over USB to a local machine and running the publisher there as well.
+
+### apriltag
+
+This container runs the apriltag algorithm and publishes a pose with covariance to `/apriltag/pose`. It also publishes frames for apriltags it sees as well as tag bundles
+
+Tag bundles are specified in the `reefscape.yaml` config in the `dalek_apriltag/config` folder. They define the location of apriltags relative to some common landmark.
+The `full_field` bundle is used for localization, all tags are defined relative to the field origin.
+NOTE: this was a pain to make, because FIRST's conventions for angles are different from ROS'. If you need to make fixes here, just adjust the positions, NOT the quaternions.
+
+Another very important piece is the static transform published in `apriltag_detector.launch`. The `base_to_camera` transform specifically. This defines the location of the camera relative to the robot center.
+Currently it's defined as 30cm forward, centered left/right, and 15cm off the floor. This is SURELY wrong and MUST be corrected or it WONT work.
+Consult the CAD, or make measurements to the tip of the lens to get this transform.
+
+This also includes a quaternion which describes the camera as facing directly in front of the robot.
+
+Adjusting this correctly is much harder as the camera frame has Z facing out of the lens as opposed to X, so any angle adjustment has to be made on top of this one.
+Pray that the camera is actually mounted perfectly straight (it's not).
+
+Ask a mentor to ask another mentor for help producing the corrected value if an angle offset is discovered. Preferrably, level the camera mechnanically so this value is right.
+
+### pose_fusion
+
+This container takes in the information from odometry and the apriltag poses and fuses it together with a Kalman filter. Sadly this hasn't been tuned at all. The covariance values for the apriltags and for the odometry are completely guessed.
+If you read the code for for the apriltag publisher in dalek_apriltag/src you can adjust some parameters to try and get better values.
+
+This really needs some in person tuning.
+You can see all the different poses and their covariances being fused by opening the RVIZ file in this directory while `ROS_MASTER_URI` is pointed at the robot. You can see the tags it sees, the odometry, the way it adjusts over time.
+
+In the robot code there is a command now to IGNORE vision measurements and just go off odom. By making it a command it can be bound to a driver button to use in a match to bail on the vision.
+
 ### nt_bridge
 
 This service is the network tables to ROS bridge I found that suited our needs best. In the future it should be changed to a submodule and then their repo should be forked with our modifications.
@@ -102,36 +150,56 @@ The hostname launch parameter needs to be changed to `10.36.37.2`(roborio's stat
 
 This service is a very simple launch file for rosbag right now which collects bag files in 5 minute increments up to 3 at a time on a special volume called `bags`. To access the data on the host, look in the `/var/lib/docker/volumes/dalek_laser_bags` directory (need to be root). Alternatively you can add a service which has this volume mounted as well and run that interactively or something. The pipeline for bag retrieval and playback will be fleshed out in the future.
 
+Note, the camera topic is not recorded by default. To record it, the `record_camera` parameter must be set to true in `compose.yaml` and it will record the compressed camera image to a bag by a different name.
+
+You will run out of space often if you enable this.
+
+### filebrowser
+
+This service is a simple service to access the above bag files for quick download and deletion.
+Its a simple web server which can be access at port 5802 on the pi's address. (`http://10.36.37.12:5802`).
+Username: admin
+Password: admin
+
 ### portainer
 
 portainer is a web frontend for managing docker containers and its especially useful when working with docker running on remote systems like with the coprocessor.
 Navigating to the coprocessor's hostname with port 5801 allows you to view a nice dashboard with all the active containers. Here you can view their logs, see any errors, and even open an interactive shell in the browser in any container you choose to interact with it.
 
-### dnsresolver
+Its a web server which can be accessed at port 5801 on the pi's address. (`https://10.36.37.12:5801`). Note that you need to tell the web browser to be okay with using unsafe https connection.
+This is good for starting and stopping containers on the field as well as accessing a shell into one of the containers in a pinch.
 
-This is a nifty little docker image I found which magically makes the docker service names appear as hostnames on the host system so you can connect to them with ROS on the host machine.
-Mostly useful for simulation.
+Username: admin
+Password: team3637team3637
+
 
 ## TODO
 
-- [ ] Add localization nodes to workspace and service.
-- [ ] Add docker compose profiles to enable running different services depending on context (simulation, map creation, bag playback, etc)
-- [ ] Implement some form of map creation using SLAM techniques
+- [x] Add localization nodes to workspace and service.
+- [x] Add docker compose profiles to enable running different services depending on context (simulation, map creation, bag playback, etc)
+- [x] Implement some form of map creation using SLAM techniques
 - [ ] Implement a map editor for cleaning up SLAM maps
-- [ ] Feed localization back to ros2nt topics to use on the robot
+- [x] Feed localization back to ros2nt topics to use on the robot
 - [ ] Implement dynamic obstacle detection/identification
 - [ ] Implement multi-scanner processing
 
 ## Usefull commands
 ```
+# Connect local ROS to orange pi
+export ROS_MASTER_URI=http://10.36.37.12:11311
+
 #Run to build and run
 sudo docker compose build
 sudo docker compose --profile (name) up
 
+# on the orangepi, frees up space
+docker builder prune
+docker image prune
+
 #Run once ran
 source /opt/ros/noetic/setup.bash
 rosrun rviz rviz
-or 
+or
 rosrun rviz rviz -d /path/to/config.rviz
 
 rosbag play --clock -l /path/to/bag/name.bag # play before rviz
