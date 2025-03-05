@@ -2,8 +2,14 @@
     <arg name="max_splits" default="3" />
     <arg name="duration_per" default="20m" />
     <arg name="bag_dir" default="/bags" />
+    <arg name="record_camera" default="false"/>
     <node pkg="rosbag" type="record" name="autobagger"
-        args="-x '(/clock)|(.*image_raw)' -a -p -o $(arg bag_dir)/auto --split --duration $(arg duration_per) --max-splits $(arg max_splits) --lz4"
+        args="-x '(/clock)|(/arducam/.*)' -a -p -o $(arg bag_dir)/auto --split --duration $(arg duration_per) --max-splits $(arg max_splits) --lz4"
+        respawn="true"
+    >
+    </node>
+    <node if="$(arg record_camera)" pkg="rosbag" type="record" name="camcorder"
+        args="/arducam/image_rect/compressed -o $(arg bag_dir)/camera --split --duration $(arg duration_per) --max-splits $(arg max_splits) --lz4"
         respawn="true"
     >
     </node>
