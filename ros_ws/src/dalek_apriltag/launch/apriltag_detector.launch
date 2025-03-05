@@ -19,14 +19,23 @@
     <node pkg="tf" type="static_transform_publisher" name="base_to_camera"
         args="0.3175 0 0.15 0.5 -0.5 0.5 -0.5 base_footprint $(arg name) 100"
         respawn="true">
-   </node>
+    </node>
 
     <!-- The "full_field" transform is a tag_bundle with all the apriltags
-        This static_transform makes the robot take the apriltag pose as gospel which may not be good
-        Working on a node which publishes apriltag pose with covariance to fuse with other sources -->
-   <node if="$(arg no_uncertainty)" pkg="tf" type="static_transform_publisher" name="apriltag_exact"
+        This static_transform makes the robot take the apriltag pose as gospel which may not be good-->
+    <node if="$(arg no_uncertainty)" pkg="tf" type="static_transform_publisher" name="apriltag_exact"
         args="0 0 0 0 0 0 full_field field_origin 100"
         respawn="true">
-   </node>
+    </node>
 
+    <node unless="$(arg no_uncertainty)" pkg="dalek_apriltag" type="apriltag_robot_pose.py" name="apriltag_pose_publisher"
+        respawn="true">
+        <param name="camera_name" value="$(arg name)"/>
+    </node>
+
+    <!-- This makes rviz happy its stupid -->
+    <node unless="$(arg no_uncertainty)" pkg="tf" type="static_transform_publisher" name="apriltag_exact"
+        args="0 0 0 0 0 0 origin map 100"
+        respawn="true">
+    </node>
 </launch>
