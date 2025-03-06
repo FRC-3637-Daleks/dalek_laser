@@ -17,7 +17,7 @@
     </node>
     <!-- Get CAD to give this for real. Can also calibrate with an apriltag mounted at a known pose -->
     <node pkg="tf" type="static_transform_publisher" name="base_to_camera"
-        args="0.3175 0 0.15 0.5 -0.5 0.5 -0.5 base_footprint $(arg name) 100"
+        args="0.3175 0 0.30 0.5 -0.5 0.5 -0.5 base_footprint $(arg name) 100"
         respawn="true">
     </node>
 
