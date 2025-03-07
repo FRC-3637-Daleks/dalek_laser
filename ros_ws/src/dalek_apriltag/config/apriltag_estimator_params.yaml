@@ -1,0 +1,4 @@
+dist_err_per_m: 0.1 # Meters of standard_deviation to add for every meter away robot is from the tag
+angle_err_per_m: 0.3 # Radians of standard deviation to add for every meter away robot is from the tag
+x_y_err_ratio: 2.0 # How much more to distrust distance from tag (x) versus strafe from tag (y)
+multitag_factor: 0.5 # How much to scale down standard deviation when multiple tags are being used

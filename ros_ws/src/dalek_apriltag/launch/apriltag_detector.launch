@@ -2,6 +2,10 @@
 <launch>
     <arg name="name" default="arducam" />
     <arg name="no_uncertainty" default="false"/>
+    <arg name="camera_transform" default="$(optenv CAMERA_TRANSFORM 0.328 0.016 0.1905 0.5 -0.5 0.5 -0.5)"/>
+    <arg name="field_layout_file" default="$(optenv FIELD_LAYOUT_FILE reefscape.yaml)"/>
+    <arg name="estimator_params_file" default="$(optenv ESTIMATOR_PARAMS_FILE apriltag_estimator_params.yaml)"/>
+
     <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="apriltag_detector" respawn="true">
         <remap from="image_rect" to="$(arg name)/image_rect" />
         <remap from="camera_info" to="$(arg name)/camera_info" />
@@ -11,13 +15,13 @@
         <param name="transport_hint" value="raw"/>
         <param name="remove_duplicates" value="true"/>
         <param name="camera_frame" value="$(arg name)" />
-        <rosparam command="load" file="$(find dalek_apriltag)/config/reefscape.yaml"/>
+        <rosparam command="load" file="$(find dalek_apriltag)/config/$(arg field_layout_file)"/>
         <!-- Lowers resolution of image for big speed-up -->
         <param name="tag_decimate" value="4.0"/>
     </node>
-    <!-- Get CAD to give this for real. Can also calibrate with an apriltag mounted at a known pose -->
+    <!-- Can also calibrate with an apriltag mounted at a known pose -->
     <node pkg="tf" type="static_transform_publisher" name="base_to_camera"
-        args="0.3175 0 0.30 0.5 -0.5 0.5 -0.5 base_footprint $(arg name) 100"
+        args="$(arg camera_transform) base_footprint $(arg name) 100"
         respawn="true">
     </node>
 
@@ -30,6 +34,7 @@
 
     <node unless="$(arg no_uncertainty)" pkg="dalek_apriltag" type="apriltag_robot_pose.py" name="apriltag_pose_publisher"
         respawn="true">
+        <rosparam command="load" file="$(find dalek_apriltag)/config/$(arg estimator_params_file)"/>
         <param name="camera_name" value="$(arg name)"/>
     </node>
 

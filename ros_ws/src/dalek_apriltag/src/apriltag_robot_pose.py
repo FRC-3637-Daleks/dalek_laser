@@ -19,9 +19,10 @@ def main():
 
     camera_frame = rospy.get_param("~camera_frame_id", "arducam")
     robot_frame = rospy.get_param("~robot_frame_id", "base_footprint")
-    dist_err_per_m = float(rospy.get_param("~dist_err_per_m", "0.03"))
-    angle_err_per_m = float(rospy.get_param("~angle_err_per_m", "0.1"))
+    dist_err_per_m = float(rospy.get_param("~dist_err_per_m", "0.1"))
+    angle_err_per_m = float(rospy.get_param("~angle_err_per_m", "0.3"))
     x_y_err_ratio = float(rospy.get_param("~x_y_err_ratio", "4.0"))
+    multitag_factor = float(rospy.get_param("multitag_factor", "0.5"))
 
     pub = rospy.Publisher("apriltag/pose", PoseWithCovarianceStamped, queue_size=1)
 
@@ -30,6 +31,7 @@ def main():
             return
 
         t = detections.header.stamp
+        saw_field = False
 
         detections = detections.detections
         closest_tag_pose = None
@@ -44,6 +46,8 @@ def main():
                 if tag_dist < closest_dist:
                     closest_tag_pose = d.pose.pose.pose
                     closest_dist = tag_dist
+            elif len(d.id) > 6:
+                saw_field = True
 
         if num_tags < 1:
             return
@@ -51,6 +55,8 @@ def main():
         avg_dist = total_dist / num_tags
 
         dist_score = 0.67*closest_dist + 0.33*avg_dist
+        if num_tags > 2:
+            dist_score *= multitag_factor
         # every 1m away 3cm of error std_dev we'll say
         a = dist_err_per_m*dist_score
         aa = a*a

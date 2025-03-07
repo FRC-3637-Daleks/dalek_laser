@@ -2,19 +2,19 @@
 <launch>
     <arg name="rectify" default="false" />
     <arg name="name" default="arducam" />
-    <arg name="camera_settings_file" default="$(find dalek_apriltag)/config/arducam_controls.yaml"/>
-    <arg name="camera_calibration_file" default="package://dalek_apriltag/config/$(arg name)_calib.yaml"/>
+    <arg name="camera_settings_file" default="$(optenv CAMERA_SETTINGS_FILE arducam_controls.yaml)"/>
+    <arg name="camera_calibration_file" default="$(optenv CAMERA_CALIBRATION_FILE arducam_calib.yaml)"/>
     <node pkg="usb_cam" type="usb_cam_node" name="$(arg name)" required="true" output="screen">
         <param name="video_device" value="/dev/video0" />
         <param name="io_method" value="userptr" />
         <param name="pixel_format" value="yuyv" />
         <param name="camera_name" value="$(arg name)" />
         <param name="camera_frame_id" value="$(arg name)" />
-        <param name="camera_info_url" value="$(arg camera_calibration_file)" />
+        <param name="camera_info_url" value="package://dalek_apriltag/config/$(arg camera_calibration_file)" />
         <param name="image_width" value="1600" />
         <param name="image_height" value="1200" />
         <param name="framerate" value="5" />
-        <rosparam command="load" file="$(arg camera_settings_file)" />
+        <rosparam command="load" file="$(find dalek_apriltag)/config/$(arg camera_settings_file)" />
     </node>
     <node if="$(arg rectify)" pkg="image_proc" type="image_proc" name="image_proc" ns="$(arg name)" required="true">
     </node>

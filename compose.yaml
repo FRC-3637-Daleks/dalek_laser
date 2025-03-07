@@ -27,6 +27,11 @@ services:
     profiles: [matchplay, vision]
     devices:
       - /dev/video0:${APRILTAG_CAMERA:-/dev/video0}
+    environment:
+      - CAMERA_CALIBRATION_FILE
+      - CAMERA_SETTINGS_FILE
+    volumes:
+      - /home/orangepi/camera_configs:/ros_ws/src/dalek_apriltag/config/custom/
     restart: unless-stopped
   filter:
     extends: base_ros_service
@@ -48,6 +53,12 @@ services:
     extends: base_ros_service
     command: roslaunch --wait dalek_apriltag apriltag_detector.launch no_uncertainty:=false
     profiles: [matchplay, vision]
+    environment:
+      - CAMERA_TRANSFORM
+      - FIELD_LAYOUT_FILE
+      - ESTIMATOR_PARAMS_FILE
+    volumes:
+      - /home/orangepi/apriltag_configs:/ros_ws/src/dalek_apriltag/config/custom/
     restart: unless-stopped
   pose_fusion:
     extends: base_ros_service
