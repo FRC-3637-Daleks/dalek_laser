@@ -1,7 +1,7 @@
 nt_table: "/Drivetrain"
-team_number: 456
+team_number: 3637
 hostname: ""
 port: "0"
-pose_covariance_diagonal: [0.01, 0.01, 0.1, 0.02, 0.02, 0.06]
-twist_covariance_diagonal: [0.005, 0.005, 0.010, 0.03, 0.03, 0.06]
+pose_covariance_diagonal: [0.001, 0.001, 0.0, 0.0, 0.0, 0.06]
+twist_covariance_diagonal: [0.0001, 0.0001, 0.00, 0.0, 0.0, 0.006]
 acc_covariance_diagonal: [0.250, 0.250, 0.250]
