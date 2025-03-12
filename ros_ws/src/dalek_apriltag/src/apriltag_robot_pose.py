@@ -65,15 +65,13 @@ def main():
         b = angle_err_per_m*dist_score
         bb = b*b
 
-        ab = a*b
-
         detection_covariance = numpy.array([
             [x_y_err_ratio*aa,0, 0, 0, 0, 0], # Harder to estimate distance to tags
-            [0, aa,0, 0, 0, ab],
+            [0, aa,0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
-            [0, ab,0, 0, 0, bb],
+            [0, 0 ,0, 0, 0, bb],
         ])
 
         robot_transform = tfBuffer.lookup_transform("full_field", robot_frame, t, rospy.Duration(1.0))
