@@ -2,7 +2,7 @@
 <launch>
     <arg name="name" default="arducam" />
     <arg name="no_uncertainty" default="false"/>
-    <arg name="camera_transform" default="$(optenv CAMERA_TRANSFORM 0.328 0.016 0.1905 0.5 -0.5 0.5 -0.5)"/>
+    <arg name="camera_transform" default="$(optenv CAMERA_TRANSFORM 0.3302 0.016 0.1905 0.5 -0.5 0.5 -0.5)"/>
     <arg name="field_layout_file" default="$(optenv FIELD_LAYOUT_FILE reefscape.yaml)"/>
     <arg name="estimator_params_file" default="$(optenv ESTIMATOR_PARAMS_FILE apriltag_estimator_params.yaml)"/>
 
