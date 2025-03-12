@@ -162,6 +162,12 @@ Note, the camera topic is not recorded by default. To record it, the `record_cam
 
 You will run out of space often if you enable this.
 
+### web_dashboard
+
+This service is a simple web-based ROS viewer node that allows for quickly seeing the state of the system (as well as the camera image) very rapidly.
+
+The web dashboard can be accessed at the robot URL on port 5803 (`http://10.36.37.12:5803`)
+
 ### filebrowser
 
 This service is a simple service to access the above bag files for quick download and deletion.

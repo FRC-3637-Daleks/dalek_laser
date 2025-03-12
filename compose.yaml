@@ -32,7 +32,6 @@ services:
       - CAMERA_SETTINGS_FILE
     volumes:
       - ${CONFIG_DIR:-/home/orangepi/dalek_laser_configs}/camera:/ros_ws/src/dalek_apriltag/config/custom/
-    restart: unless-stopped
   filter:
     extends: base_ros_service
     command: roslaunch --wait laser_filter t_laser_filter.launch
@@ -59,12 +58,10 @@ services:
       - ESTIMATOR_PARAMS_FILE
     volumes:
       - ${CONFIG_DIR:-/home/orangepi/dalek_laser_configs}/apriltag:/ros_ws/src/dalek_apriltag/config/custom/
-    restart: unless-stopped
   pose_fusion:
     extends: base_ros_service
     command: roslaunch --wait pose_fusion localize.launch
     profiles: [matchplay]
-    restart: unless-stopped
   nt_bridge:
     extends: base_ros_service
     command: roslaunch --wait frc_basics ros_bridge.launch hostname:=nt.server
@@ -78,6 +75,10 @@ services:
     profiles: [matchplay]
     volumes:
       - bags:/bags
+  web_dashboard:
+    extends: base_ros_service
+    command: roslaunch --wait rosboard rosboard.launch port:=5803
+    profiles: [matchplay]
   sim:
     extends: base_ros_service
     command: roslaunch --wait frc_sim_gazebo frc_sim.launch
