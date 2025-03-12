@@ -74,6 +74,106 @@ To build the ROS workspace, just `cd ros_ws` and `catkin_make`. Of course, you w
     rosdep update
     rosdep install --from-paths src/ -y --ignore-src
 
+## Deploying to a fresh orangepi
+
+These instructions are specific to setting up an orangepi with this stack as it currently exists.
+
+### Flash ubuntu to an SD card
+Use balena etcher to image a new SD card for the orangepi. Use one of the ubuntu server or desktop images found here: http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/service-and-support/Orange-Pi-5-plus.html
+
+### Boot up orangepi and log-in
+Connect your orangepi to a LAN with an internet connection (home router over ethernet is easiest). Use the ethernet port FURTHEST from the USB-C power port.
+
+Power it over USB-C with a standard USB-C 5V power supply.
+
+Hopefully, you should be able to ssh into it with its default hostname
+
+```
+ssh orangepi@orangepi5plus
+```
+
+Also try `orangepi5plus.local` or `orangepi5plus.lan` if that doesn't work.
+
+If no hostname works, then try to log into your router and see the device list with IP addresses. If this isn't possible, you could try to use nmap or something to probe the local network for devices.
+
+### First time configuration
+
+Once you log in over ssh, run `sudo orangepi-config`.
+Go through the settings and make changes as you desire. I usually set the timezone to US Eastern.
+Be sure to enable ssh and avahi dns service.
+
+More importantly, update the hostname to be `dalekpi` or whatever you want.
+
+Most importantly, under the IP settings under network, set a *static* IP on the interface that is not currently plugged in (the empty ethernet port). Put a static IP `10.36.37.12` with netmask `255.255.255.0` and default gateway `10.36.37.1`. Make sure to always plug the pi into the robot using THIS port (the port closest to the USB-C port).
+
+This allows you to access it via this static IP and not have to fuss with hostnames.
+
+### Add ssh keys to ease future logins
+
+Edit the `~.ssh/authorized_keys` file and paste in your public key so you don't need to use a password to login and can use ssh to remote deploy docker containers.
+
+```
+vim ~/.ssh/authorized_keys
+<paste in your public key>
+```
+
+### Install docker packages
+
+We need 2 packages, docker-buildx-plugin and docker-compose-plugin
+
+```
+sudo apt update
+sudo apt install docker-buildx-plugin docker-compose-plugin
+sudo apt upgrade # may as well do this too
+```
+
+### Clone this repo
+
+In the home directory
+```
+git clone --recursive https://github.com/FRC-3637-Daleks/dalek_laser.git
+```
+
+### Build the containers
+
+Simply cd into dalek_laser and build it as normal
+
+```
+cd dalek_laser
+docker compose --profile matchplay --env-file robot.env build
+```
+
+### First time run
+
+Run it for the first time with the default configuration. This should pull containers as well.
+```
+docker compose --profile matchplay --env-file robot.env up -d
+```
+
+### Enable docker so containers come up on startup
+the docker daemon must be enabled in systemd so that whenever the pi powers up the containers start on their own
+
+```
+sudo systemctl enable docker
+```
+
+### Customize configuration
+
+Files in the dalek_laser_configs directories will be mounted to a "custom" config directory in the workspace depending on the service. See the `robot_custom.env` as an example.
+
+If you want to customize those configs, first copy the default/original into the relevant dalek_laser_configs directory from the dalek_laser source directory. Then feel free to edit them. Finally, modify your `.env` file to point the appropriate launch files at the custom configs via the relevant environment variable (see `robot_custom.env` to see which exist).
+
+### Optional setup
+
+The orangepi has no internal clock and relies on the network for an accurate time. It uses a package called fake-hwclock to save the time between reboots if it comes up without connecting to a network with access to the time.
+However, it only updates this saved clock every hour. To fix this, we can add a cron job to save the time every minute.
+
+Add the following to a file in `/etc/cron.d`
+
+```
+* * * * * root fake-hwclock save
+```
+
 ## Services
 
 ### rosmaster
