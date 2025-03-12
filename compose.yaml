@@ -31,7 +31,7 @@ services:
       - CAMERA_CALIBRATION_FILE
       - CAMERA_SETTINGS_FILE
     volumes:
-      - /home/orangepi/camera_configs:/ros_ws/src/dalek_apriltag/config/custom/
+      - ${CONFIG_DIR:-/home/orangepi/dalek_laser_configs}/camera:/ros_ws/src/dalek_apriltag/config/custom/
     restart: unless-stopped
   filter:
     extends: base_ros_service
@@ -58,7 +58,7 @@ services:
       - FIELD_LAYOUT_FILE
       - ESTIMATOR_PARAMS_FILE
     volumes:
-      - /home/orangepi/apriltag_configs:/ros_ws/src/dalek_apriltag/config/custom/
+      - ${CONFIG_DIR:-/home/orangepi/dalek_laser_configs}/apriltag:/ros_ws/src/dalek_apriltag/config/custom/
     restart: unless-stopped
   pose_fusion:
     extends: base_ros_service
