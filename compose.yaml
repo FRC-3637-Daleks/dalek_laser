@@ -120,6 +120,10 @@ services:
 volumes:
   data:
   bags:
+    driver: local
+    driver_opts:
+      type: ${BAG_DRIVE_FS_TYPE:-vfat}
+      device: ${BAG_DRIVE:-/dev/sda1}
   photonvision_config:
 networks:
   ros:
