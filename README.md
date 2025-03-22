@@ -256,7 +256,7 @@ The hostname launch parameter needs to be changed to `10.36.37.2`(roborio's stat
 
 ### bagger
 
-This service is a very simple launch file for rosbag right now which collects bag files in 5 minute increments up to 3 at a time on a special volume called `bags`. To access the data on the host, look in the `/var/lib/docker/volumes/dalek_laser_bags` directory (need to be root). Alternatively you can add a service which has this volume mounted as well and run that interactively or something. The pipeline for bag retrieval and playback will be fleshed out in the future.
+This service is a very simple launch file for rosbag right now which collects bag files in 5 minute increments up to 3 at a time on a special volume called `bags`. The `bags` volume is mounted to a USB drive (`/dev/sda1`) by default. If no usb-drive is plugged in, this service won't run. To access the data on the host, look in the `/var/lib/docker/volumes/dalek_laser_bags` directory (need to be root). Alternatively you can add a service which has this volume mounted as well and run that interactively or something. The pipeline for bag retrieval and playback will be fleshed out in the future.
 
 Note, the camera topic is not recorded by default. To record it, the `record_camera` parameter must be set to true in `compose.yaml` and it will record the compressed camera image to a bag by a different name.
 
