@@ -29,7 +29,7 @@
           false, false, false]</rosparam>
 
         <!-- impact how the covariance grows when we cant see any tags -->
-        <param name="dynamic_process_noise_covariance" value="false" />
+        <param name="dynamic_process_noise_covariance" value="true" />
         <rosparam param="process_noise_covariance">
             [0.0005, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
             0,    0.0005, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
