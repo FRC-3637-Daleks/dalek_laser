@@ -40,12 +40,14 @@ FROM build_environment AS wpilib_build
 RUN mkdir /wpilib
 WORKDIR /wpilib
 
-ADD https://github.com/wpilibsuite/allwpilib.git#v2025.3.1 /wpilib/allwpilib
+#This doesn't cache
+#ADD https://github.com/wpilibsuite/allwpilib.git#v2025.3.1 /wpilib/allwpilib
+RUN git clone "https://github.com/wpilibsuite/allwpilib.git" --branch v2025.3.1 --single-branch /wpilib/allwpilib
 RUN mkdir build/
 RUN --mount=type=cache,target=build/ \
     cd build && \
     cmake ../allwpilib -DWITH_JAVA=OFF -DWITH_JAVA_SOURCE=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_WPILIB=OFF -DWITH_WPIMATH=OFF -DWITH_GUI=OFF -DWITH_WPIUNITS=OFF -DWITH_EXAMPLES=OFF -DWITH_TESTS=OFF && \
-    cmake --build . --parallel 10 && \
+    cmake --build . --parallel 16 && \
     cmake --build . --target install
 
 FROM build_environment
@@ -70,7 +72,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     --mount=target=/var/cache/apt,type=cache,sharing=locked \
     rm -f /etc/apt/apt.conf.d/docker-clean && \
     apt-get update && \
-    rosdep update && \
+    rosdep update --include-eol-distros && \
     rosdep install --from-paths src --ignore-src -y
 
 COPY --from=wpilib_build /usr/local/include/ /usr/local/include/
