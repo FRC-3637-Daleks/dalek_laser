@@ -112,6 +112,7 @@ services:
     restart: always
   filebrowser: # Web UI for downloading/uploading files
     image: filebrowser/filebrowser
+    profiles: [matchplay]
     ports:
       - 5802:80
     volumes:
