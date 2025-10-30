@@ -100,8 +100,8 @@
         </surface>
       </collision>
       <sensor type="ray" name="laser">
-        <pose>-0.3175 0.3175 0.15 0 0 0</pose>
-        <visualize>true</visualize>
+	<pose>0.3048 -0.3048 0.18 0 0 2.70</pose>
+        <visualize>false</visualize>
         <update_rate>10</update_rate>
         <ray>
           <scan>

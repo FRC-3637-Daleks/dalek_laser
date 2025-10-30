@@ -281,7 +281,7 @@ void DrivetrainInterfaceNode::pub_callback()
       pubImu_.publish(imu_msg);
     }
 
-    if (tf_buffer_.canTransform("map", "odom", ros::Time(0), ros::Duration(1.0))) {
+    if (tf_buffer_.canTransform("map", "odom", ros::Time(0), ros::Duration(0.01))) {
       const auto map_to_odom = tf_buffer_.lookupTransform("map", "odom", ros::Time(0));
       const auto transform = map_to_odom.transform;
       std::vector<double> correctionLinear(3);
