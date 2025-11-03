@@ -1,0 +1,11 @@
+<?xml version="3.0"?>
+<launch>
+  <node pkg="gmapping" type="slam_gmapping" name="dalek_slam">
+    <remap from="scan" to="scan_filtered"/>
+    <param name="base_frame" value="base_footprint"/>
+    <param name="xmin" value="-40.0"/>
+    <param name="ymin" value="-20.0"/>
+    <param name="xmax" value="40"/>
+    <param name="ymax" value="20"/>
+  </node>
+</launch>

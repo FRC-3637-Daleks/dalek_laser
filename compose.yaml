@@ -34,20 +34,22 @@ services:
       - ${CONFIG_DIR:-/home/orangepi/dalek_laser_configs}/camera:/ros_ws/src/dalek_apriltag/config/custom/
   filter:
     extends: base_ros_service
-    command: roslaunch --wait laser_filter t_laser_filter.launch
-    profiles: [slam, olarta]
+    command: roslaunch --wait scan_filter filter.launch
+    profiles: [slam]
   slam:
     extends: base_ros_service
-    command: roslaunch --wait slam_toolbox lifelong.launch
+    command: roslaunch --wait dalek_mapping slam.launch
     profiles: [slam]
     depends_on:
       - filter
-  olarta:
+  save_map:
     extends: base_ros_service
-    command: roslaunch --wait olarta localize.launch
-    profiles: [olarta]
+    command: rosrun map_server map_saver -f /maps/${MAP_FILENAME:-map}
+    volumes:
+      - maps:/maps
+    restart: never
     depends_on:
-      - filter
+      - slam
   apriltag:
     extends: base_ros_service
     command: roslaunch --wait dalek_apriltag apriltag_detector.launch no_uncertainty:=false
@@ -117,6 +119,7 @@ services:
       - 5802:80
     volumes:
       - bags:/srv/bags
+      - maps:/srv/maps
     restart: always
 volumes:
   data:
@@ -125,6 +128,7 @@ volumes:
     driver_opts:
       type: ${BAG_DRIVE_FS_TYPE:-vfat}
       device: ${BAG_DRIVE:-/dev/sda1}
+  maps:
   photonvision_config:
 networks:
   ros:
